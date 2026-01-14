@@ -21,11 +21,7 @@ body.dark{
 *{box-sizing:border-box}
 body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;background:var(--bg);color:var(--text)}
 
-.topbar{
-  position:sticky;top:0;z-index:10;
-  background:linear-gradient(90deg,var(--brand),var(--brand2));
-  color:#fff;padding:14px 16px
-}
+.topbar{position:sticky;top:0;z-index:10;background:linear-gradient(90deg,var(--brand),var(--brand2));color:#fff;padding:14px 16px}
 .topbar-row{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
 .btn{border:none;border-radius:999px;padding:10px 12px;background:rgba(255,255,255,.14);color:#fff;font-weight:800;cursor:pointer}
 
@@ -45,19 +41,21 @@ body.dark .tile{background:rgba(148,163,184,.07)}
 .tile .k{font-size:.8rem;color:var(--muted)}
 .tile .v{font-size:1.25rem;font-weight:900}
 
-a.pill{
-  display:inline-flex;gap:8px;align-items:center;
-  padding:10px 14px;border-radius:999px;
-  border:1px solid var(--ring);
-  font-weight:900;text-decoration:none;color:var(--text)
-}
-
 iframe{width:100%;border:1px solid var(--ring);border-radius:14px;background:#fff}
 
 .pdfwrap{border:1px solid var(--ring);border-radius:14px;overflow:hidden}
 .pdfbar{display:flex;justify-content:space-between;gap:8px;padding:10px;background:rgba(12,59,102,.06)}
 .pdfbtn{border:1px solid var(--ring);border-radius:999px;padding:6px 10px;font-weight:900;background:transparent;cursor:pointer}
 canvas{width:100%;display:block;background:#fff}
+
+.chk{display:flex;gap:10px;padding:10px;border:1px solid var(--ring);border-radius:14px}
+
+a.pill{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:10px 14px;border-radius:999px;
+  border:1px solid var(--ring);
+  font-weight:900;text-decoration:none;color:var(--text)
+}
 
 .col-12{grid-column:span 12}
 @media(max-width:860px){.tiles{grid-template-columns:1fr}}
@@ -70,7 +68,7 @@ canvas{width:100%;display:block;background:#fff}
   <div class="topbar-row">
     <div>
       <strong>Flaine & Grand Massif</strong><br>
-      <span style="font-size:.85rem;opacity:.9">Live weather • Lifts • Maps</span>
+      <span style="font-size:.85rem;opacity:.9">Live weather • Lifts • Maps • Off-piste</span>
     </div>
     <button class="btn" id="darkBtn">🌙 Dark</button>
   </div>
@@ -86,40 +84,45 @@ canvas{width:100%;display:block;background:#fff}
     <span class="badge ok" id="wxStatus">Live</span>
   </div>
   <div class="card-b tiles">
-    <div class="tile">
-      <div class="k">Temperature</div>
-      <div class="v" id="wxTemp">--</div>
-    </div>
-    <div class="tile">
-      <div class="k">Wind</div>
-      <div class="v" id="wxWind">--</div>
-    </div>
-    <div class="tile">
-      <div class="k">Wind Gust</div>
-      <div class="v" id="wxGust">--</div>
-    </div>
-    <div class="tile">
-      <div class="k">Snow (next hours)</div>
-      <div class="v" id="wxSnow">--</div>
-    </div>
+    <div class="tile"><div class="k">Temperature</div><div class="v" id="wxTemp">--</div></div>
+    <div class="tile"><div class="k">Wind</div><div class="v" id="wxWind">--</div></div>
+    <div class="tile"><div class="k">Wind Gust</div><div class="v" id="wxGust">--</div></div>
+    <div class="tile"><div class="k">Snow (next hours)</div><div class="v" id="wxSnow">--</div></div>
   </div>
 </div>
 
-<!-- OFFICIAL STATUS -->
+<!-- OFFICIAL STATUS (OPTION 1) -->
 <div class="card col-12">
   <div class="card-h">
     <strong>Official Lift & Piste Status</strong>
-    <span class="badge ok">Live (official)</span>
+    <span class="badge ok">Live</span>
   </div>
   <div class="card-b">
+
     <strong>Flaine – Opening Status</strong>
     <iframe src="https://www.flaine.com/en/weather-opening/" loading="lazy" style="height:520px"></iframe>
 
     <div style="height:14px"></div>
 
     <strong>Grand Massif – Lift & Piste Map</strong>
-    <iframe src="https://www.grand-massif.com/en/trail-map/" loading="lazy" style="height:520px"></iframe>
+    <iframe id="gmFrame"
+      src="https://www.grand-massif.com/en/trail-map/"
+      loading="lazy"
+      style="height:520px"></iframe>
+
+    <div id="gmFallback" style="display:none;margin-top:10px">
+      <a class="pill" target="_blank" href="https://www.grand-massif.com/en/trail-map/">
+        Open Grand Massif official map
+      </a>
+    </div>
+
   </div>
+</div>
+
+<!-- OFF-PISTE SUGGESTIONS -->
+<div class="card col-12">
+  <div class="card-h"><strong>Off-piste (community-known zones)</strong></div>
+  <div class="card-b" id="offpisteList"></div>
 </div>
 
 <!-- PDF MAP -->
@@ -156,33 +159,58 @@ const $ = id => document.getElementById(id);
 // Dark mode
 $('darkBtn').onclick=()=>document.body.classList.toggle('dark');
 
-// WEATHER — Open-Meteo (NO API KEY)
-const LAT = 46.001, LON = 6.688;
+// WEATHER — Open-Meteo (no key)
+const LAT=46.001, LON=6.688;
 async function loadWeather(){
   try{
-    const url = `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current=temperature_2m,wind_speed_10m,wind_gusts_10m&hourly=snowfall&timezone=auto`;
-    const r = await fetch(url);
-    const d = await r.json();
-
-    $('wxTemp').textContent = Math.round(d.current.temperature_2m) + '°C';
-    $('wxWind').textContent = d.current.wind_speed_10m.toFixed(1) + ' m/s';
-    $('wxGust').textContent = d.current.wind_gusts_10m.toFixed(1) + ' m/s';
-
-    const snowNext = d.hourly.snowfall.slice(0,6).reduce((a,b)=>a+b,0);
-    $('wxSnow').textContent = snowNext > 0 ? snowNext.toFixed(1)+' mm' : 'None';
+    const r=await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current=temperature_2m,wind_speed_10m,wind_gusts_10m&hourly=snowfall&timezone=auto`);
+    const d=await r.json();
+    $('wxTemp').textContent=Math.round(d.current.temperature_2m)+'°C';
+    $('wxWind').textContent=d.current.wind_speed_10m.toFixed(1)+' m/s';
+    $('wxGust').textContent=d.current.wind_gusts_10m.toFixed(1)+' m/s';
+    const snow=d.hourly.snowfall.slice(0,6).reduce((a,b)=>a+b,0);
+    $('wxSnow').textContent=snow>0?snow.toFixed(1)+' mm':'None';
   }catch(e){
-    $('wxStatus').textContent = 'Unavailable';
-    $('wxStatus').className = 'badge warn';
+    $('wxStatus').textContent='Unavailable';
+    $('wxStatus').className='badge warn';
   }
 }
 loadWeather();
+
+// GM iframe fallback
+setTimeout(()=>{
+  const f=document.getElementById('gmFrame');
+  try{
+    if(!f.contentDocument || f.contentDocument.body.innerHTML.length<100){
+      f.style.display='none';
+      document.getElementById('gmFallback').style.display='block';
+    }
+  }catch(e){
+    f.style.display='none';
+    document.getElementById('gmFallback').style.display='block';
+  }
+},3000);
+
+// OFF-PISTE LIST
+const zones=[
+  {name:'Combe de Gers',desc:'High alpine bowl. Best with a guide.'},
+  {name:'Lindars / Véret Bowls',desc:'Accessible side bowls near upper lifts.'},
+  {name:'Trees toward Samoëns',desc:'Sheltered lines, good in low visibility.'},
+  {name:'Trees toward Les Carroz',desc:'Sunny side, watch return timing.'}
+];
+const root=$('offpisteList');
+zones.forEach(z=>{
+  const d=document.createElement('div');
+  d.className='chk';
+  d.innerHTML=`<strong>${z.name}</strong><br><span style="color:var(--muted);font-size:.9rem">${z.desc}</span>`;
+  root.appendChild(d);
+});
 
 // PDF
 const PDF='GM_PlanPistes_25_26_HD_copy.pdf';
 let pdf,page=1,scale=0.9,fit=true;
 const DPR=Math.min(devicePixelRatio||1,1.5);
 const canvas=$('pdfCanvas'),ctx=canvas.getContext('2d');
-
 async function render(){
   const p=await pdf.getPage(page);
   const base=p.getViewport({scale:1});
