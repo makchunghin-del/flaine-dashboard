@@ -12,34 +12,30 @@
   --ok:#0f7b3a; --bad:#c62828; --warn:#b26a00;
   --ring: rgba(12,59,102,.18);
   --shadow: 0 10px 22px rgba(0,0,0,.08);
-  --radius:16px;
 }
 body.dark{
   --bg:#0b1220; --card:#0f172a; --text:#e8eefc; --muted:#a9b4c7;
-  --brand:#1b3d6b; --brand2:#0b223f;
   --ring: rgba(148,163,184,.18);
   --shadow: 0 10px 22px rgba(0,0,0,.35);
 }
 *{box-sizing:border-box}
 body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;background:var(--bg);color:var(--text)}
 
-.topbar{
-  position:sticky;top:0;z-index:10;
-  background:linear-gradient(90deg,var(--brand),var(--brand2));
-  color:#fff;padding:14px 16px
-}
-.topbar-row{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.topbar{position:sticky;top:0;z-index:10;background:linear-gradient(90deg,var(--brand),var(--brand2));color:#fff;padding:14px 16px}
+.topbar-row{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+
 .btn{border:none;border-radius:999px;padding:10px 12px;background:rgba(255,255,255,.14);color:#fff;font-weight:800;cursor:pointer}
 .btn.secondary{background:rgba(255,255,255,.1)}
 
 .wrap{padding:14px;max-width:1200px;margin:auto}
 .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:12px}
+
 .card{background:var(--card);border-radius:16px;box-shadow:var(--shadow);border:1px solid var(--ring)}
-.card-h{padding:12px 14px;display:flex;justify-content:space-between;gap:10px;align-items:center}
+.card-h{padding:12px 14px;display:flex;justify-content:space-between;align-items:center}
 .card-b{padding:12px 14px}
 
 .badge{border:1px solid var(--ring);border-radius:999px;padding:6px 10px;font-weight:800;font-size:.8rem}
-.badge.ok{color:var(--ok)} .badge.warn{color:var(--warn)} .badge.bad{color:var(--bad)}
+.badge.ok{color:var(--ok)} .badge.warn{color:var(--warn)}
 
 .tiles{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
 .tile{padding:12px;border-radius:14px;border:1px solid var(--ring);background:rgba(12,59,102,.06)}
@@ -47,19 +43,17 @@ body.dark .tile{background:rgba(148,163,184,.07)}
 .tile .k{font-size:.8rem;color:var(--muted)}
 .tile .v{font-size:1.25rem;font-weight:900}
 
-.settings{display:grid;gap:10px}
-.settings label{font-weight:900;font-size:.85rem}
-.settings input{padding:8px 10px;border-radius:10px;border:1px solid var(--ring);font-weight:800}
+.settings label{font-weight:900;font-size:.85rem;display:block;margin-bottom:6px}
+.settings input{padding:8px 10px;border-radius:10px;border:1px solid var(--ring);font-weight:800;margin-right:6px}
 
 a.pill{
-  display:inline-flex;gap:8px;align-items:center;
+  display:inline-flex;align-items:center;gap:8px;
   padding:10px 14px;border-radius:999px;
   border:1px solid var(--ring);
-  font-weight:900;text-decoration:none;
-  color:var(--text);
+  font-weight:900;text-decoration:none;color:var(--text)
 }
 
-.chk{display:flex;gap:10px;padding:10px;border:1px solid var(--ring);border-radius:14px}
+iframe{width:100%;border:1px solid var(--ring);border-radius:14px;background:#fff}
 
 .pdfwrap{border:1px solid var(--ring);border-radius:14px;overflow:hidden}
 .pdfbar{display:flex;justify-content:space-between;gap:8px;padding:10px;background:rgba(12,59,102,.06)}
@@ -114,39 +108,49 @@ canvas{width:100%;display:block;background:#fff}
   <div class="card-b settings">
     <label>Last lift time <input type="time" id="lastLift"></label>
     <label>Return warning <input type="time" id="returnWarn"></label>
-    <div>
-      <button class="btn secondary" id="saveSettings">Save</button>
-      <button class="btn secondary" id="resetSettings">Reset</button>
-    </div>
+    <button class="btn secondary" id="saveSettings">Save</button>
+    <button class="btn secondary" id="resetSettings">Reset</button>
   </div>
 </div>
 
-<!-- OFFICIAL STATUS (FIXED, NO IFRAMES) -->
+<!-- OFFICIAL STATUS (EMBED + FALLBACK) -->
 <div class="card col-12">
   <div class="card-h">
     <strong>Official Lift & Piste Status</strong>
     <span class="badge ok">Live (official)</span>
   </div>
   <div class="card-b">
-    <p style="margin-top:0;color:var(--muted);font-size:.9rem">
-      These open in official sites (iframes are blocked by resort security).
-    </p>
 
-    <div style="display:flex;gap:10px;flex-wrap:wrap">
-      <a class="pill" target="_blank" href="https://www.flaine.com/en/weather-opening/">
-        🟢 Flaine – Lift & Piste Status
-      </a>
-      <a class="pill" target="_blank" href="https://www.grand-massif.com/en/trail-map/">
-        🟢 Grand Massif – Live Trail Map
-      </a>
-      <a class="pill" target="_blank" href="https://www.grand-massif.com/en/the-weather-at-your-stations/">
-        🌦️ Grand Massif – Weather
+    <strong>Flaine – Opening Status</strong>
+    <iframe
+      src="https://www.flaine.com/en/weather-opening/"
+      loading="lazy"
+      referrerpolicy="no-referrer"
+      style="height:520px">
+    </iframe>
+
+    <div style="height:14px"></div>
+
+    <strong>Grand Massif – Lift & Piste Map</strong>
+    <iframe
+      id="gmFrame"
+      src="https://www.grand-massif.com/en/trail-map/"
+      loading="lazy"
+      referrerpolicy="no-referrer"
+      style="height:520px">
+    </iframe>
+
+    <div id="gmFallback" style="display:none;margin-top:10px">
+      <a class="pill" target="_blank"
+         href="https://www.grand-massif.com/en/trail-map/">
+        Open Grand Massif official map
       </a>
     </div>
+
   </div>
 </div>
 
-<!-- EMBEDDED PDF MAP -->
+<!-- PDF MAP -->
 <div class="card col-12">
   <div class="card-h"><strong>Piste map (PDF)</strong></div>
   <div class="card-b">
@@ -184,10 +188,8 @@ pdfjsLib.GlobalWorkerOptions.workerSrc =
 const $ = id => document.getElementById(id);
 const LS = {get:(k,d)=>JSON.parse(localStorage.getItem(k)||JSON.stringify(d)),set:(k,v)=>localStorage.setItem(k,JSON.stringify(v))};
 
-// Dark mode
 $('darkBtn').onclick=()=>document.body.classList.toggle('dark');
 
-// Loaded badge
 function loaded(){ $('loadedAt').textContent='Loaded '+new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}); }
 loaded();
 
@@ -202,7 +204,6 @@ function loadSettings(){
 $('saveSettings').onclick=()=>{LS.set('settings',{lastLift:$('lastLift').value,returnWarn:$('returnWarn').value});updateTimers();};
 $('resetSettings').onclick=()=>{LS.set('settings',DEFAULTS);loadSettings();};
 
-// Timers
 function updateTimers(){
   const s=LS.get('settings',DEFAULTS), now=new Date();
   let [h,m]=s.lastLift.split(':').map(Number);
@@ -227,6 +228,20 @@ async function weather(){
   $('wxWind').textContent=d.wind.speed.toFixed(1)+' m/s';
 }
 weather();
+
+// GM iframe fallback detection
+setTimeout(()=>{
+  const f=document.getElementById('gmFrame');
+  try{
+    if(!f.contentDocument || f.contentDocument.body.innerHTML.length<100){
+      f.style.display='none';
+      document.getElementById('gmFallback').style.display='block';
+    }
+  }catch(e){
+    f.style.display='none';
+    document.getElementById('gmFallback').style.display='block';
+  }
+},3000);
 
 // PDF
 const PDF='GM_PlanPistes_25_26_HD_copy.pdf';
@@ -257,10 +272,11 @@ const zones=['Combe de Gers','Trees toward Samoëns','Trees toward Carroz'];
 function renderOff(){
   const s=LS.get('off',{}),r=$('offpisteList');r.innerHTML='';
   zones.forEach(z=>{
-    const row=document.createElement('div');row.className='chk';
+    const row=document.createElement('div');
     const cb=document.createElement('input');cb.type='checkbox';cb.checked=!!s[z];
     cb.onchange=()=>{s[z]=cb.checked;LS.set('off',s);};
-    row.appendChild(cb);row.appendChild(document.createTextNode(z));r.appendChild(row);
+    row.appendChild(cb);row.appendChild(document.createTextNode(' '+z));
+    r.appendChild(row);
   });
 }
 renderOff();
