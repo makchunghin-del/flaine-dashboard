@@ -51,23 +51,15 @@ body.dark .tile{background:rgba(148,163,184,.07)}
 .settings label{font-weight:900;font-size:.85rem}
 .settings input{padding:8px 10px;border-radius:10px;border:1px solid var(--ring);font-weight:800}
 
-table{width:100%;border-collapse:collapse}
-th,td{padding:8px;border-bottom:1px solid var(--ring)}
-th{font-size:.8rem;color:var(--muted)}
-
-.liftbtn{border:none;border-radius:999px;padding:8px 12px;font-weight:900;cursor:pointer}
-.liftbtn.open{background:rgba(15,123,58,.15);color:var(--ok)}
-.liftbtn.closed{background:rgba(198,40,40,.15);color:var(--bad)}
-.liftbtn.unknown{background:rgba(178,106,0,.15);color:var(--warn)}
+a.pill{
+  display:inline-flex;gap:8px;align-items:center;
+  padding:10px 14px;border-radius:999px;
+  border:1px solid var(--ring);
+  font-weight:900;text-decoration:none;
+  color:var(--text);
+}
 
 .chk{display:flex;gap:10px;padding:10px;border:1px solid var(--ring);border-radius:14px}
-
-iframe{
-  width:100%;
-  border:1px solid var(--ring);
-  border-radius:14px;
-  background:#fff;
-}
 
 .pdfwrap{border:1px solid var(--ring);border-radius:14px;overflow:hidden}
 .pdfbar{display:flex;justify-content:space-between;gap:8px;padding:10px;background:rgba(12,59,102,.06)}
@@ -129,24 +121,28 @@ canvas{width:100%;display:block;background:#fff}
   </div>
 </div>
 
-<!-- OFFICIAL STATUS EMBED -->
+<!-- OFFICIAL STATUS (FIXED, NO IFRAMES) -->
 <div class="card col-12">
   <div class="card-h">
     <strong>Official Lift & Piste Status</strong>
     <span class="badge ok">Live (official)</span>
   </div>
   <div class="card-b">
-    <p style="color:var(--muted);font-size:.9rem;margin-top:0">
-      Direct from resort websites. Use this for real lift decisions.
+    <p style="margin-top:0;color:var(--muted);font-size:.9rem">
+      These open in official sites (iframes are blocked by resort security).
     </p>
 
-    <strong>Flaine – Opening Status</strong>
-    <iframe src="https://www.flaine.com/en/weather-opening/" loading="lazy" style="height:520px"></iframe>
-
-    <div style="height:12px"></div>
-
-    <strong>Grand Massif – Lift & Piste Map</strong>
-    <iframe src="https://www.grand-massif.com/en/trail-map/" loading="lazy" style="height:520px"></iframe>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <a class="pill" target="_blank" href="https://www.flaine.com/en/weather-opening/">
+        🟢 Flaine – Lift & Piste Status
+      </a>
+      <a class="pill" target="_blank" href="https://www.grand-massif.com/en/trail-map/">
+        🟢 Grand Massif – Live Trail Map
+      </a>
+      <a class="pill" target="_blank" href="https://www.grand-massif.com/en/the-weather-at-your-stations/">
+        🌦️ Grand Massif – Weather
+      </a>
+    </div>
   </div>
 </div>
 
@@ -171,17 +167,6 @@ canvas{width:100%;display:block;background:#fff}
   </div>
 </div>
 
-<!-- LIFTS (CROWDSOURCED) -->
-<div class="card col-12">
-  <div class="card-h"><strong>Lifts (on-hill check)</strong></div>
-  <div class="card-b">
-    <table>
-      <thead><tr><th>Lift</th><th>Status</th><th>Note</th></tr></thead>
-      <tbody id="liftTable"></tbody>
-    </table>
-  </div>
-</div>
-
 <!-- OFF-PISTE -->
 <div class="card col-12">
   <div class="card-h"><strong>Off-piste planning</strong></div>
@@ -199,7 +184,7 @@ pdfjsLib.GlobalWorkerOptions.workerSrc =
 const $ = id => document.getElementById(id);
 const LS = {get:(k,d)=>JSON.parse(localStorage.getItem(k)||JSON.stringify(d)),set:(k,v)=>localStorage.setItem(k,JSON.stringify(v))};
 
-// Dark
+// Dark mode
 $('darkBtn').onclick=()=>document.body.classList.toggle('dark');
 
 // Loaded badge
@@ -266,22 +251,6 @@ $('zoomIn').onclick=()=>{fit=false;scale+=0.15;render();};
 $('zoomOut').onclick=()=>{fit=false;scale=Math.max(0.6,scale-0.15);render();};
 $('fit').onclick=()=>{fit=true;render();};
 setTimeout(loadPdf,300);
-
-// Lifts
-const lifts=[['gp','Grandes Platières'],['veret','Véret'],['aup','Aup de Véran'],['lin','Lindars Nord']];
-function renderLifts(){
-  const s=LS.get('lifts',{}),tb=$('liftTable');tb.innerHTML='';
-  lifts.forEach(([k,n])=>{
-    const st=s[k]||'unknown';
-    const b=document.createElement('button');
-    b.className='liftbtn '+st; b.textContent=st.toUpperCase();
-    b.onclick=()=>{s[k]=st==='unknown'?'open':st==='open'?'closed':'unknown';LS.set('lifts',s);renderLifts();};
-    const tr=document.createElement('tr');
-    tr.innerHTML=`<td>${n}</td><td></td><td>On-hill observation</td>`;
-    tr.children[1].appendChild(b); tb.appendChild(tr);
-  });
-}
-renderLifts();
 
 // Off-piste
 const zones=['Combe de Gers','Trees toward Samoëns','Trees toward Carroz'];
