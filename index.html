@@ -1,76 +1,112 @@
 <!DOCTYPE html><html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Flaine Snowboard Live Dashboard</title>
+<title>Flaine & Grand Massif Snowboard Live Dashboard</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
   body { font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif; background:#eef2f7; margin:0; }
   header { background:#0c3b66; color:#fff; padding:20px; }
   header h1 { margin:0; font-size:1.6rem; }
-  header p { margin:5px 0 0; opacity:0.9; }
+  header p { margin:6px 0 0; opacity:0.9; }
   .container { padding:16px; display:grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap:16px; }
   .card { background:#fff; border-radius:12px; padding:16px; box-shadow:0 4px 10px rgba(0,0,0,0.08); }
   h2 { margin-top:0; color:#0c3b66; font-size:1.2rem; }
   iframe { width:100%; border:none; border-radius:10px; }
   table { width:100%; border-collapse:collapse; }
   td, th { padding:8px; border-bottom:1px solid #ddd; text-align:left; }
-  .status-open { color:green; font-weight:600; }
-  .status-closed { color:red; font-weight:600; }
+  .open { color:green; font-weight:600; }
+  .closed { color:red; font-weight:600; }
   footer { text-align:center; padding:14px; background:#0c3b66; color:#fff; font-size:0.85rem; }
   a { color:#0c3b66; text-decoration:none; font-weight:600; }
+  body.dark { background:#0f172a; color:#e5e7eb; }
+  body.dark header, body.dark footer { background:#020617; }
+  body.dark .card { background:#020617; color:#e5e7eb; }
+  .toggle { cursor:pointer; padding:6px 10px; border-radius:6px; background:#0c3b66; color:#fff; font-size:0.85rem; display:inline-block; }
 </style>
 </head>
 <body><header>
-  <h1>Flaine Snowboard Live Dashboard</h1>
-  <p>Weather · Snow · Lifts · Webcams · Last Ride Info</p>
+  <h1>Flaine & Grand Massif Snowboard Dashboard</h1>
+  <p>Weather · Snow · Lifts · Webcams · Piste Maps · Return Safety</p>
+  <div class="toggle" onclick="toggleDark()">Toggle Dark Mode</div>
 </header><div class="container">  <div class="card">
-    <h2>Live Weather & Snow</h2>
+    <h2>Weather & Snow (Flaine)</h2>
     <ul>
-      <li><a href="https://www.snow-forecast.com/resorts/Flaine/snow-report" target="_blank">Snow Report (Snow‑Forecast)</a></li>
-      <li><a href="https://www.snow-forecast.com/resorts/Flaine/6day/mid" target="_blank">6‑Day Forecast</a></li>
-      <li><a href="https://www.grand-massif.com/en/the-weather-at-your-stations/" target="_blank">Official Resort Weather</a></li>
+      <li><a href="https://www.snow-forecast.com/resorts/Flaine/snow-report" target="_blank">Flaine Snow Report</a></li>
+      <li><a href="https://www.snow-forecast.com/resorts/Flaine/6day/mid" target="_blank">Flaine 6‑Day Forecast</a></li>
+      <li><a href="https://www.flaine.com/en/weather-opening/" target="_blank">Official Flaine Weather</a></li>
     </ul>
-    <p><small>Use links above for live snow depth, wind and snowfall forecast.</small></p>
   </div>  <div class="card">
-    <h2>Live Webcams</h2>
+    <h2>Weather & Snow (Grand Massif)</h2>
+    <ul>
+      <li><a href="https://www.grand-massif.com/en/the-weather-at-your-stations/" target="_blank">Grand Massif Weather</a></li>
+      <li><a href="https://www.skiresort.info/ski-holiday-in/grand-massif/snow-report/" target="_blank">Grand Massif Snow Report</a></li>
+    </ul>
+  </div>  <div class="card">
+    <h2>Live Webcams – Flaine</h2>
     <iframe src="https://www.flaine.com/en/webcams/" height="260"></iframe>
-    <p><small>Summit · Mid‑station · Village views</small></p>
   </div>  <div class="card">
-    <h2>Lift Status (Manual / Visual)</h2>
+    <h2>Live Webcams – Grand Massif</h2>
+    <iframe src="https://www.grand-massif.com/en/webcams/" height="260"></iframe>
+  </div>  <div class="card">
+    <h2>Lift Status – Key Flaine Lifts</h2>
     <table>
       <tr><th>Lift</th><th>Status</th></tr>
-      <tr><td>Grandes Platières Gondola</td><td class="status-open">Open</td></tr>
-      <tr><td>Aup de Véran Gondola</td><td class="status-open">Open</td></tr>
-      <tr><td>Véret Chair</td><td class="status-open">Open</td></tr>
-      <tr><td>Lindars Nord</td><td class="status-closed">Closed / Weather</td></tr>
+      <tr><td>Grandes Platières Gondola</td><td class="open">Open</td></tr>
+      <tr><td>Aup de Véran Gondola</td><td class="open">Open</td></tr>
+      <tr><td>Véret Chair</td><td class="open">Open</td></tr>
+      <tr><td>Lindars Nord</td><td class="closed">Weather Dependent</td></tr>
     </table>
-    <p><small>Tip: Confirm on official piste map before riding.</small></p>
+    <p><small>Always verify on live piste map.</small></p>
   </div>  <div class="card">
-    <h2>Operating Hours</h2>
+    <h2>Lift Status – Grand Massif Sectors</h2>
+    <table>
+      <tr><th>Sector</th><th>Status</th></tr>
+      <tr><td>Flaine</td><td class="open">Base Sector</td></tr>
+      <tr><td>Samoëns</td><td class="open">Connected – return early</td></tr>
+      <tr><td>Les Carroz</td><td class="open">Sunny – watch time</td></tr>
+      <tr><td>Morillon</td><td class="closed">Far – risk after 15:30</td></tr>
+    </table>
+    <p><small>⚠ If you are outside Flaine after 15:30, start returning immediately.</small></p>
+  </div>  <div class="card">
+    <h2>Piste Maps (Live)</h2>
+    <ul>
+      <li><a href="https://www.flaine.com/en/piste-map/" target="_blank">Flaine Live Piste Map</a></li>
+      <li><a href="https://www.grand-massif.com/en/trail-map/" target="_blank">Grand Massif Trail Map</a></li>
+    </ul>
+  </div>  <div class="card">
+    <h2>Operating Hours & Last Ride</h2>
     <table>
       <tr><td>First Lift</td><td>08:30</td></tr>
-      <tr><td>Last Ride Up</td><td>16:30</td></tr>
-      <tr><td>Last Run Down</td><td>~16:45–17:00</td></tr>
+      <tr><td>Last Ride Up</td><td id="lastLift">16:30</td></tr>
+      <tr><td>Recommended Return</td><td>Before 16:00 (cross-sector)</td></tr>
+      <tr><td><strong>Time Until Last Lift</strong></td><td id="countdown">--</td></tr>
     </table>
-    <p><small>Hours vary by weather & visibility.</small></p>
   </div>  <div class="card">
-    <h2>Restaurant Crowd (Guide)</h2>
+    <h2>Restaurant Crowd Guide</h2>
     <ul>
       <li>10:30–11:30 → 🟢 Quiet</li>
-      <li>12:00–14:00 → 🔴 Peak Lunch</li>
+      <li>12:00–14:00 → 🔴 Very Busy</li>
       <li>14:30–15:30 → 🟡 Calmer</li>
-    </ul>
-    <p><small>Based on typical rider flow patterns.</small></p>
-  </div>  <div class="card">
-    <h2>Quick Links</h2>
-    <ul>
-      <li><a href="https://www.flaine.com/en/piste-map/" target="_blank">Live Piste & Lift Map</a></li>
-      <li><a href="https://www.grand-massif.com/en/trail-map/" target="_blank">Grand Massif Map</a></li>
-      <li><a href="https://en.wikipedia.org/wiki/Flaine" target="_blank">Resort Overview</a></li>
     </ul>
   </div></div><footer>
   <p>Dashboard loaded at <span id="time"></span></p>
 </footer><script>
   document.getElementById('time').textContent = new Date().toLocaleString();
+</script><script>
+function toggleDark(){ document.body.classList.toggle('dark'); }
+function updateCountdown(){
+  const now = new Date();
+  const last = new Date();
+  const [h,m] = document.getElementById('lastLift').innerText.split(':');
+  last.setHours(h, m, 0, 0);
+  const diff = last - now;
+  const el = document.getElementById('countdown');
+  if(diff <= 0){ el.innerText = 'Lifts Closed'; return; }
+  const mins = Math.floor(diff/60000);
+  const hrs = Math.floor(mins/60);
+  el.innerText = hrs + 'h ' + (mins%60) + 'm';
+}
+setInterval(updateCountdown, 60000);
+updateCountdown();
 </script></body>
 </html>
