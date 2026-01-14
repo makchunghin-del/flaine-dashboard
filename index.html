@@ -1,137 +1,563 @@
 <!DOCTYPE html><html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Flaine & Grand Massif Snowboard Live Dashboard</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<style>
-  body { font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif; background:#eef2f7; margin:0; }
-  header { background:#0c3b66; color:#fff; padding:20px; }
-  header h1 { margin:0; font-size:1.6rem; }
-  header p { margin:6px 0 0; opacity:0.9; }
-  .container { padding:16px; display:grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap:16px; }
-  .card { background:#fff; border-radius:12px; padding:16px; box-shadow:0 4px 10px rgba(0,0,0,0.08); }
-  h2 { margin-top:0; color:#0c3b66; font-size:1.2rem; }
-  iframe { width:100%; border:none; border-radius:10px; }
-  table { width:100%; border-collapse:collapse; }
-  td, th { padding:8px; border-bottom:1px solid #ddd; text-align:left; }
-  .open { color:green; font-weight:600; }
-  .closed { color:red; font-weight:600; }
-  footer { text-align:center; padding:14px; background:#0c3b66; color:#fff; font-size:0.85rem; }
-  a { color:#0c3b66; text-decoration:none; font-weight:600; }
-  body.dark { background:#0f172a; color:#e5e7eb; }
-  body.dark header, body.dark footer { background:#020617; }
-  body.dark .card { background:#020617; color:#e5e7eb; }
-  .toggle { cursor:pointer; padding:6px 10px; border-radius:6px; background:#0c3b66; color:#fff; font-size:0.85rem; display:inline-block; }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Flaine & Grand Massif Snowboard Dashboard</title>
+  <style>
+    :root{
+      --bg:#eef2f7; --card:#ffffff; --text:#0b1220; --muted:#5b6575;
+      --brand:#0c3b66; --brand2:#0a2f52;
+      --ok:#0f7b3a; --bad:#c62828; --warn:#b26a00;
+      --ring: rgba(12,59,102,.18);
+      --shadow: 0 10px 22px rgba(0,0,0,.08);
+      --radius:16px;
+    }
+    body.dark{
+      --bg:#0b1220; --card:#0f172a; --text:#e8eefc; --muted:#a9b4c7;
+      --brand:#1b3d6b; --brand2:#0b223f;
+      --ring: rgba(148,163,184,.18);
+      --shadow: 0 10px 22px rgba(0,0,0,.35);
+    }
+    *{box-sizing:border-box}
+    body{margin:0; font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial; background:var(--bg); color:var(--text);}/* Top bar */
+.topbar{position:sticky; top:0; z-index:10; background:linear-gradient(90deg,var(--brand),var(--brand2)); color:#fff; padding:14px 16px; box-shadow:0 6px 18px rgba(0,0,0,.18)}
+.topbar-row{display:flex; gap:10px; align-items:center; justify-content:space-between; flex-wrap:wrap}
+.title{display:flex; flex-direction:column; gap:2px}
+.title h1{margin:0; font-size:1.1rem; line-height:1.2}
+.title .sub{font-size:.85rem; opacity:.92}
+.actions{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
+.btn{border:none; border-radius:999px; padding:10px 12px; background:rgba(255,255,255,.14); color:#fff; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:8px}
+.btn:active{transform:translateY(1px)}
+.btn.secondary{background:rgba(255,255,255,.10)}
+
+/* Layout */
+.wrap{padding:14px 14px 26px; max-width:1100px; margin:0 auto;}
+.grid{display:grid; grid-template-columns: repeat(12, 1fr); gap:12px;}
+.card{background:var(--card); border-radius:var(--radius); box-shadow:var(--shadow); border:1px solid var(--ring); overflow:hidden}
+.card-h{padding:12px 14px; display:flex; align-items:flex-start; justify-content:space-between; gap:10px}
+.card-h h2{margin:0; font-size:1.0rem;}
+.card-h .hint{color:var(--muted); font-size:.85rem; margin-top:3px}
+.card-b{padding:0 14px 14px}
+
+/* Quick stats tiles */
+.tiles{display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:10px; padding:12px 14px 14px}
+.tile{border-radius:14px; padding:12px; border:1px solid var(--ring); background:rgba(12,59,102,.06)}
+body.dark .tile{background:rgba(148,163,184,.07)}
+.tile .k{font-size:.82rem; color:var(--muted)}
+.tile .v{font-size:1.25rem; font-weight:900; margin-top:4px}
+.tile .s{font-size:.82rem; color:var(--muted); margin-top:4px}
+
+/* Badges */
+.badge{display:inline-flex; align-items:center; gap:6px; border:1px solid var(--ring); border-radius:999px; padding:6px 10px; font-weight:800; font-size:.8rem;}
+.badge.ok{color:var(--ok)}
+.badge.warn{color:var(--warn)}
+.badge.bad{color:var(--bad)}
+
+/* Links */
+a{color:var(--brand); font-weight:800; text-decoration:none}
+body.dark a{color:#93c5fd}
+.linkrow{display:flex; flex-wrap:wrap; gap:10px}
+.pill{display:inline-flex; align-items:center; gap:8px; padding:10px 12px; border-radius:999px; border:1px solid var(--ring); background:transparent; font-weight:800}
+
+/* Lift table */
+table{width:100%; border-collapse:collapse}
+th, td{padding:10px 6px; border-bottom:1px solid var(--ring); text-align:left; font-size:.95rem}
+th{color:var(--muted); font-size:.82rem; font-weight:900}
+.liftbtn{border:none; border-radius:999px; padding:9px 12px; font-weight:900; cursor:pointer; min-width:92px}
+.liftbtn.open{background:rgba(15,123,58,.12); color:var(--ok)}
+.liftbtn.closed{background:rgba(198,40,40,.12); color:var(--bad)}
+.liftbtn.unknown{background:rgba(178,106,0,.12); color:var(--warn)}
+
+/* Off-piste */
+.checklist{display:grid; gap:10px; margin-top:8px}
+.chk{display:flex; gap:10px; align-items:flex-start; padding:10px; border-radius:14px; border:1px solid var(--ring)}
+.chk input{margin-top:3px; width:18px; height:18px}
+.chk .name{font-weight:900}
+.chk .desc{color:var(--muted); font-size:.9rem; margin-top:3px}
+
+/* Collapsible */
+details{border-top:1px solid var(--ring)}
+summary{list-style:none; cursor:pointer; padding:12px 14px; font-weight:900}
+summary::-webkit-details-marker{display:none}
+summary .sumrow{display:flex; align-items:center; justify-content:space-between; gap:10px}
+.chev{opacity:.7}
+
+/* Iframes */
+iframe{width:100%; border:none; border-radius:14px}
+
+/* Responsive */
+.col-12{grid-column: span 12}
+.col-8{grid-column: span 8}
+.col-6{grid-column: span 6}
+.col-4{grid-column: span 4}
+
+@media (max-width: 860px){
+  .col-8,.col-6,.col-4{grid-column: span 12}
+  .tiles{grid-template-columns: repeat(2, minmax(0,1fr))}
+}
+
+  </style>
 </head>
-<body><header>
-  <h1>Flaine & Grand Massif Snowboard Dashboard</h1>
-  <p>Weather · Snow · Lifts · Webcams · Piste Maps · Return Safety</p>
-  <div class="toggle" onclick="toggleDark()">Toggle Dark Mode</div>
-</header><div class="container">  <div class="card">
-    <h2>Easy Access Maps</h2>
-    <ul>
-      <li><a href="https://www.flaine.com/en/piste-map/" target="_blank">Flaine Live Piste & Lift Map</a></li>
-      <li><a href="https://www.grand-massif.com/en/trail-map/" target="_blank">Grand Massif Full Area Map</a></li>
-      <li><a href="https://www.google.com/maps/search/Combe+de+Gers" target="_blank">Combe de Gers (Google Maps)</a></li>
-    </ul>
-    <p><small>Open these quickly to orient yourself before dropping in.</small></p>
-  </div>  <div class="card">
-    <h2>Live Weather (API)</h2>
-    <p id="weather">Loading weather…</p>
-    <p><small>Powered by OpenWeather (mountain conditions approximated).</small></p>
-  </div>  <div class="card">
-    <h2>Weather & Snow (Grand Massif)</h2>
-    <ul>
-      <li><a href="https://www.grand-massif.com/en/the-weather-at-your-stations/" target="_blank">Grand Massif Weather</a></li>
-      <li><a href="https://www.skiresort.info/ski-holiday-in/grand-massif/snow-report/" target="_blank">Grand Massif Snow Report</a></li>
-    </ul>
-  </div>  <div class="card">
-    <h2>Live Webcams – Flaine</h2>
-    <iframe src="https://www.flaine.com/en/webcams/" height="260"></iframe>
-  </div>  <div class="card">
-    <h2>Live Webcams – Grand Massif</h2>
-    <iframe src="https://www.grand-massif.com/en/webcams/" height="260"></iframe>
-  </div>  <div class="card">
-    <h2>Lift Status – Tap to Update</h2>
-    <table>
-      <tr><th>Lift</th><th>Status</th></tr>
-      <tr><td>Grandes Platières</td><td><button onclick="toggleStatus(this)" class="open">OPEN</button></td></tr>
-      <tr><td>Aup de Véran</td><td><button onclick="toggleStatus(this)" class="open">OPEN</button></td></tr>
-      <tr><td>Véret</td><td><button onclick="toggleStatus(this)" class="open">OPEN</button></td></tr>
-      <tr><td>Lindars Nord</td><td><button onclick="toggleStatus(this)" class="closed">CLOSED</button></td></tr>
-    </table>
-    <p><small>Crowdsourced: tap to switch OPEN / CLOSED.</small></p>
-  </div>  <div class="card">
-    <h2>Lift Status – Grand Massif Sectors</h2>
-    <table>
-      <tr><th>Sector</th><th>Status</th></tr>
-      <tr><td>Flaine</td><td class="open">Base Sector</td></tr>
-      <tr><td>Samoëns</td><td class="open">Connected – return early</td></tr>
-      <tr><td>Les Carroz</td><td class="open">Sunny – watch time</td></tr>
-      <tr><td>Morillon</td><td class="closed">Far – risk after 15:30</td></tr>
-    </table>
-    <p><small>⚠ If you are outside Flaine after 15:30, start returning immediately.</small></p>
-  </div>  <div class="card">
-    <h2>Piste Maps (Live)</h2>
-    <ul>
-      <li><a href="https://www.flaine.com/en/piste-map/" target="_blank">Flaine Live Piste Map</a></li>
-      <li><a href="https://www.grand-massif.com/en/trail-map/" target="_blank">Grand Massif Trail Map</a></li>
-    </ul>
-  </div>  <div class="card">
-    <h2>Operating Hours & Last Ride</h2>
-    <table>
-      <tr><td>First Lift</td><td>08:30</td></tr>
-      <tr><td>Last Ride Up</td><td id="lastLift">16:30</td></tr>
-      <tr><td>Recommended Return</td><td>Before 16:00 (cross-sector)</td></tr>
-      <tr><td><strong>Time Until Last Lift</strong></td><td id="countdown">--</td></tr>
-    </table>
-  </div>  <div class="card">
-    <h2>Off‑Piste Overlay</h2>
-    <p><strong>Key Zones:</strong></p>
-    <ul>
-      <li><input type="checkbox" checked> Combe de Gers – high alpine bowl (advanced)</li>
-      <li><input type="checkbox" checked> Lindars / Véret side bowls</li>
-      <li><input type="checkbox"> Tree runs toward Samoëns</li>
-      <li><input type="checkbox"> Tree runs toward Les Carroz</li>
-    </ul>
-    <p><small>Use with map links above. Always assess avalanche risk.</small></p>
-  </div></div><footer>
-  <p>Dashboard loaded at <span id="time"></span></p>
-</footer><script>
-  document.getElementById('time').textContent = new Date().toLocaleString();
-function toggleStatus(btn){
-  if(btn.classList.contains('open')){
-    btn.classList.remove('open'); btn.classList.add('closed'); btn.innerText='CLOSED';
-  } else {
-    btn.classList.remove('closed'); btn.classList.add('open'); btn.innerText='OPEN';
+<body>  <div class="topbar">
+    <div class="topbar-row">
+      <div class="title">
+        <h1>Flaine & Grand Massif Dashboard</h1>
+        <div class="sub">Quick-glance weather • lifts • maps • return timing</div>
+      </div>
+      <div class="actions">
+        <button class="btn" id="darkBtn">🌙 Dark</button>
+        <button class="btn secondary" id="refreshBtn">🔄 Refresh</button>
+      </div>
+    </div>
+  </div>  <div class="wrap"><!-- QUICK GLANCE -->
+<div class="grid">
+  <div class="card col-12">
+    <div class="card-h">
+      <div>
+        <h2>Today at a glance</h2>
+        <div class="hint">Everything important in 5 seconds</div>
+      </div>
+      <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end">
+        <span class="badge" id="loadedAt">Loaded: --</span>
+        <span class="badge warn" id="returnBadge">Return: --</span>
+        <span class="badge" id="liftCountdownBadge">Last lift: --</span>
+      </div>
+    </div>
+    <div class="tiles">
+      <div class="tile">
+        <div class="k">Weather (Flaine)</div>
+        <div class="v" id="wxMain">--</div>
+        <div class="s" id="wxSub">Set API key to enable live weather</div>
+      </div>
+      <div class="tile">
+        <div class="k">Wind</div>
+        <div class="v" id="wxWind">--</div>
+        <div class="s" id="wxWindSub">Windy days = higher lift closure risk</div>
+      </div>
+      <div class="tile">
+        <div class="k">Time until last lift</div>
+        <div class="v" id="countdown">--</div>
+        <div class="s" id="lastLiftText">Default last lift: <strong>16:30</strong> (adjust in settings)</div>
+      </div>
+      <div class="tile">
+        <div class="k">Lunch crowd (guide)</div>
+        <div class="v">12:00–14:00</div>
+        <div class="s">Go early (10:30–11:30) or late (14:30–15:30)</div>
+      </div>
+    </div>
+
+    <details open>
+      <summary>
+        <div class="sumrow">
+          <span>Fast links</span>
+          <span class="chev">⌄</span>
+        </div>
+      </summary>
+      <div class="card-b">
+        <div class="linkrow">
+          <a class="pill" href="https://www.flaine.com/en/piste-map/" target="_blank">🗺️ Flaine live piste/lifts</a>
+          <a class="pill" href="https://www.grand-massif.com/en/trail-map/" target="_blank">🗺️ Grand Massif map</a>
+          <a class="pill" href="https://www.grand-massif.com/en/the-weather-at-your-stations/" target="_blank">🌦️ Official GM weather</a>
+          <a class="pill" href="https://www.flaine.com/en/webcams/" target="_blank">🎥 Flaine webcams</a>
+          <a class="pill" href="https://www.grand-massif.com/en/webcams/" target="_blank">🎥 GM webcams</a>
+        </div>
+      </div>
+    </details>
+  </div>
+
+  <!-- WEATHER + WEBCAMS -->
+  <div class="card col-6">
+    <div class="card-h">
+      <div>
+        <h2>Live weather (API)</h2>
+        <div class="hint">Fast and readable (temp + condition)</div>
+      </div>
+      <span class="badge" id="wxStatus">--</span>
+    </div>
+    <div class="card-b">
+      <p style="margin:10px 0 10px; color:var(--muted)">This uses OpenWeather. Add your API key in the code to activate.</p>
+      <div class="linkrow" style="margin-top:6px">
+        <a class="pill" href="https://openweathermap.org/api" target="_blank">🔑 Get free API key</a>
+        <a class="pill" href="https://www.snow-forecast.com/resorts/Flaine/snow-report" target="_blank">❄️ Snow report (backup)</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="card col-6">
+    <div class="card-h">
+      <div>
+        <h2>Webcams</h2>
+        <div class="hint">Use this to judge visibility & wind</div>
+      </div>
+      <span class="badge">Tap link if embed blocks</span>
+    </div>
+    <div class="card-b">
+      <iframe src="https://www.flaine.com/en/webcams/" height="260" loading="lazy"></iframe>
+    </div>
+  </div>
+
+  <!-- LIFTS (CROWDSOURCED) -->
+  <div class="card col-8">
+    <div class="card-h">
+      <div>
+        <h2>Lift status (tap to update)</h2>
+        <div class="hint">For your group: quick OPEN/CLOSED/UNKNOWN — saved on your phone</div>
+      </div>
+      <span class="badge" id="liftSaved">Saved locally</span>
+    </div>
+    <div class="card-b">
+      <table>
+        <thead>
+          <tr><th>Lift (Flaine)</th><th>Status</th><th>Note</th></tr>
+        </thead>
+        <tbody id="liftTable"></tbody>
+      </table>
+      <p style="margin:10px 0 0; color:var(--muted); font-size:.9rem">
+        Tip: if wind is strong, expect upper lifts (e.g., Grandes Platières / Lindars) to close first.
+      </p>
+    </div>
+  </div>
+
+  <!-- RETURN SAFETY -->
+  <div class="card col-4">
+    <div class="card-h">
+      <div>
+        <h2>Return safety</h2>
+        <div class="hint">Avoid being stranded across sectors</div>
+      </div>
+      <span class="badge warn">Time critical</span>
+    </div>
+    <div class="card-b">
+      <table>
+        <thead><tr><th>Where you are</th><th>Action</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Flaine</strong></td><td><span class="badge ok">Safe base</span></td></tr>
+          <tr><td><strong>Samoëns</strong></td><td><span class="badge warn">Return early</span></td></tr>
+          <tr><td><strong>Les Carroz</strong></td><td><span class="badge warn">Watch time</span></td></tr>
+          <tr><td><strong>Morillon</strong></td><td><span class="badge bad">Don’t push after 15:30</span></td></tr>
+        </tbody>
+      </table>
+      <p style="margin:10px 0 0; color:var(--muted); font-size:.9rem">Rule of thumb: if you’re outside Flaine after <strong>15:30</strong>, start returning immediately.</p>
+    </div>
+  </div>
+
+  <!-- OFF-PISTE OVERLAY (PLANNING) -->
+  <div class="card col-12">
+    <div class="card-h">
+      <div>
+        <h2>Off-piste overlay (planning toggle)</h2>
+        <div class="hint">Helps you locate key zones on the maps (not GPS)</div>
+      </div>
+      <span class="badge bad">Avalanche risk</span>
+    </div>
+    <div class="card-b">
+      <div class="linkrow" style="margin-bottom:10px">
+        <a class="pill" href="https://www.google.com/maps/search/Combe+de+Gers" target="_blank">🧭 Combe de Gers (map)</a>
+        <a class="pill" href="https://www.flaine.com/en/piste-map/" target="_blank">🗺️ Open piste map</a>
+      </div>
+
+      <div class="checklist" id="offpisteList"></div>
+
+      <details>
+        <summary>
+          <div class="sumrow">
+            <span>Safety reminders (read before going)</span>
+            <span class="chev">⌄</span>
+          </div>
+        </summary>
+        <div class="card-b">
+          <ul style="margin:0; padding-left:18px; color:var(--muted)">
+            <li>Carry beacon/shovel/probe and know how to use them.</li>
+            <li>Check avalanche bulletin & wind loading before committing.</li>
+            <li>If you’re unsure, hire a local guide/instructor for the day.</li>
+          </ul>
+        </div>
+      </details>
+    </div>
+  </div>
+
+  <!-- SETTINGS -->
+  <div class="card col-12">
+    <div class="card-h">
+      <div>
+        <h2>Settings</h2>
+        <div class="hint">Make the dashboard match the day</div>
+      </div>
+      <span class="badge">1-minute setup</span>
+    </div>
+    <div class="card-b">
+      <div class="grid" style="gap:10px">
+        <div class="col-6">
+          <label style="font-weight:900; font-size:.9rem">Last lift time</label>
+          <input id="lastLift" type="time" value="16:30" style="width:100%; padding:12px; border-radius:12px; border:1px solid var(--ring); background:transparent; color:var(--text); font-weight:900; margin-top:6px">
+          <div style="color:var(--muted); font-size:.85rem; margin-top:6px">Update this if signage says a different last lift time.</div>
+        </div>
+        <div class="col-6">
+          <label style="font-weight:900; font-size:.9rem">Return warning time</label>
+          <input id="returnWarn" type="time" value="15:30" style="width:100%; padding:12px; border-radius:12px; border:1px solid var(--ring); background:transparent; color:var(--text); font-weight:900; margin-top:6px">
+          <div style="color:var(--muted); font-size:.85rem; margin-top:6px">If you’re outside Flaine after this time, start returning.</div>
+        </div>
+        <div class="col-12" style="display:flex; gap:10px; flex-wrap:wrap; margin-top:6px">
+          <button class="btn" style="background:var(--brand);" id="saveSettings">💾 Save settings</button>
+          <button class="btn secondary" id="resetLocal">🧹 Reset local data</button>
+        </div>
+      </div>
+
+      <details style="margin-top:12px">
+        <summary>
+          <div class="sumrow">
+            <span>Enable real weather (OpenWeather API key)</span>
+            <span class="chev">⌄</span>
+          </div>
+        </summary>
+        <div class="card-b">
+          <p style="margin-top:0; color:var(--muted)">Open the HTML and replace <code>YOUR_API_KEY</code> with your key. Flaine coordinates are prefilled. Refresh after saving.</p>
+          <pre style="margin:0; padding:12px; border-radius:14px; border:1px solid var(--ring); overflow:auto; background:rgba(12,59,102,.06)"><code>const OPENWEATHER_KEY = "YOUR_API_KEY";</code></pre>
+        </div>
+      </details>
+    </div>
+  </div>
+
+</div>
+
+  </div>  <footer style="text-align:center; padding:14px 10px; color:var(--muted)">
+    Tip: Add this page to Android Home Screen after hosting (GitHub Pages) for one-tap access.
+  </footer><script>
+  // ====== CONFIG ======
+  // Flaine approximate coords (center of resort). You can refine if you want.
+  const FLAINE = { lat: 46.001, lon: 6.688 };
+  const OPENWEATHER_KEY = "YOUR_API_KEY"; // <- replace to enable live weather
+
+  // ====== UTIL ======
+  const $ = (id)=>document.getElementById(id);
+  const LS = {
+    get:(k,def)=>{ try{ const v = localStorage.getItem(k); return v? JSON.parse(v): def; }catch(e){ return def; } },
+    set:(k,v)=>{ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+  };
+
+  // ====== DARK MODE ======
+  function setDark(on){
+    document.body.classList.toggle('dark', on);
+    LS.set('dark', on);
+    $('darkBtn').textContent = on ? '☀️ Light' : '🌙 Dark';
   }
-}
+  $('darkBtn').addEventListener('click', ()=> setDark(!document.body.classList.contains('dark')));
+  setDark(LS.get('dark', false));
 
-async function loadWeather(){
-  try{
-    const res = await fetch('https://api.openweathermap.org/data/2.5/weather?lat=46.000&lon=6.688&units=metric&appid=YOUR_API_KEY');
-    const d = await res.json();
-    document.getElementById('weather').innerText = `Temp: ${d.main.temp}°C · Wind: ${d.wind.speed} m/s · ${d.weather[0].description}`;
-  }catch(e){ document.getElementById('weather').innerText='Weather unavailable'; }
-}
-loadWeather();
+  // ====== LOADED TIME ======
+  function setLoadedBadge(){
+    const t = new Date();
+    $('loadedAt').textContent = 'Loaded: ' + t.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+  }
+  setLoadedBadge();
 
-</script><script>
-function toggleDark(){ document.body.classList.toggle('dark'); }
-function updateCountdown(){
-  const now = new Date();
-  const last = new Date();
-  const [h,m] = document.getElementById('lastLift').innerText.split(':');
-  last.setHours(h, m, 0, 0);
-  const diff = last - now;
-  const el = document.getElementById('countdown');
-  if(diff <= 0){ el.innerText = 'Lifts Closed'; return; }
-  const mins = Math.floor(diff/60000);
-  const hrs = Math.floor(mins/60);
-  el.innerText = hrs + 'h ' + (mins%60) + 'm';
-}
-setInterval(updateCountdown, 60000);
-updateCountdown();
+  // ====== SETTINGS ======
+  const settings = LS.get('settings', { lastLift:'16:30', returnWarn:'15:30' });
+  $('lastLift').value = settings.lastLift;
+  $('returnWarn').value = settings.returnWarn;
+
+  function saveSettings(){
+    const s = { lastLift: $('lastLift').value || '16:30', returnWarn: $('returnWarn').value || '15:30' };
+    LS.set('settings', s);
+    updateCountdown();
+    updateReturnBadge();
+  }
+  $('saveSettings').addEventListener('click', saveSettings);
+
+  $('resetLocal').addEventListener('click', ()=>{
+    localStorage.removeItem('liftStatuses');
+    localStorage.removeItem('offpiste');
+    renderLiftTable();
+    renderOffpiste();
+  });
+
+  // ====== COUNTDOWN ======
+  function updateCountdown(){
+    const s = LS.get('settings', { lastLift:'16:30', returnWarn:'15:30' });
+    const [h,m] = (s.lastLift||'16:30').split(':').map(Number);
+    const now = new Date();
+    const last = new Date();
+    last.setHours(h, m, 0, 0);
+
+    const diff = last - now;
+    if(diff <= 0){
+      $('countdown').textContent = 'Closed';
+      $('liftCountdownBadge').textContent = 'Last lift: closed';
+      return;
+    }
+    const mins = Math.floor(diff/60000);
+    const hrs = Math.floor(mins/60);
+    $('countdown').textContent = `${hrs}h ${mins%60}m`;
+    $('liftCountdownBadge').textContent = `Last lift: ${s.lastLift} (${hrs}h ${mins%60}m)`;
+  }
+  setInterval(updateCountdown, 30000);
+  updateCountdown();
+
+  function updateReturnBadge(){
+    const s = LS.get('settings', { lastLift:'16:30', returnWarn:'15:30' });
+    const [h,m] = (s.returnWarn||'15:30').split(':').map(Number);
+    const now = new Date();
+    const warn = new Date();
+    warn.setHours(h,m,0,0);
+    const diff = warn - now;
+
+    if(diff <= 0){
+      $('returnBadge').className = 'badge bad';
+      $('returnBadge').textContent = `Return: NOW (past ${s.returnWarn})`;
+      return;
+    }
+    const mins = Math.floor(diff/60000);
+    const hrs = Math.floor(mins/60);
+    $('returnBadge').className = mins <= 60 ? 'badge warn' : 'badge';
+    $('returnBadge').textContent = `Return: ${s.returnWarn} (in ${hrs}h ${mins%60}m)`;
+  }
+  setInterval(updateReturnBadge, 30000);
+  updateReturnBadge();
+
+  // ====== REFRESH BUTTON ======
+  $('refreshBtn').addEventListener('click', ()=>{
+    setLoadedBadge();
+    loadWeather();
+    updateCountdown();
+    updateReturnBadge();
+  });
+
+  // ====== WEATHER (OpenWeather) ======
+  async function loadWeather(){
+    const keyOk = OPENWEATHER_KEY && OPENWEATHER_KEY !== 'YOUR_API_KEY';
+    if(!keyOk){
+      $('wxStatus').textContent = 'API key needed';
+      $('wxStatus').className = 'badge warn';
+      $('wxMain').textContent = '--';
+      $('wxSub').textContent = 'Add your OpenWeather key to enable live weather';
+      $('wxWind').textContent = '--';
+      return;
+    }
+
+    try{
+      $('wxStatus').textContent = 'Loading…';
+      $('wxStatus').className = 'badge';
+      const url = `https://api.openweathermap.org/data/2.5/weather?lat=${FLAINE.lat}&lon=${FLAINE.lon}&units=metric&appid=${OPENWEATHER_KEY}`;
+      const res = await fetch(url, { cache: 'no-store' });
+      const d = await res.json();
+
+      if(!d || !d.main){ throw new Error('Bad response'); }
+
+      const temp = Math.round(d.main.temp);
+      const feels = Math.round(d.main.feels_like);
+      const desc = (d.weather && d.weather[0] && d.weather[0].description) ? d.weather[0].description : '—';
+      const wind = (d.wind && typeof d.wind.speed === 'number') ? d.wind.speed : null;
+
+      $('wxMain').textContent = `${temp}°C`;
+      $('wxSub').textContent = `${desc} · feels like ${feels}°C`;
+      $('wxWind').textContent = wind !== null ? `${wind.toFixed(1)} m/s` : '--';
+
+      // simple status interpretation
+      if(wind !== null && wind >= 10){
+        $('wxStatus').textContent = 'Windy (closure risk)';
+        $('wxStatus').className = 'badge warn';
+      } else {
+        $('wxStatus').textContent = 'Live';
+        $('wxStatus').className = 'badge ok';
+      }
+    }catch(e){
+      $('wxStatus').textContent = 'Unavailable';
+      $('wxStatus').className = 'badge bad';
+      $('wxSub').textContent = 'Could not load weather. Use Snow Forecast link as backup.';
+    }
+  }
+  loadWeather();
+
+  // ====== LIFTS (tap + local save) ======
+  const liftDefaults = [
+    { key:'grand_platieres', name:'Grandes Platières', note:'High altitude access (wind sensitive)', status:'unknown' },
+    { key:'aup_de_veran', name:'Aup de Véran', note:'Core sector lift', status:'unknown' },
+    { key:'veret', name:'Véret', note:'Good access to upper terrain', status:'unknown' },
+    { key:'lindars_nord', name:'Lindars Nord', note:'Often affected by wind/visibility', status:'unknown' },
+  ];
+
+  function nextStatus(cur){
+    if(cur === 'unknown') return 'open';
+    if(cur === 'open') return 'closed';
+    return 'unknown';
+  }
+
+  function statusLabel(s){
+    if(s==='open') return {text:'OPEN', cls:'open'};
+    if(s==='closed') return {text:'CLOSED', cls:'closed'};
+    return {text:'UNKNOWN', cls:'unknown'};
+  }
+
+  function renderLiftTable(){
+    const saved = LS.get('liftStatuses', {});
+    const rows = liftDefaults.map(l => ({...l, status: saved[l.key] || l.status }));
+    const tbody = $('liftTable');
+    tbody.innerHTML = '';
+
+    rows.forEach(l => {
+      const tr = document.createElement('tr');
+      const td1 = document.createElement('td');
+      td1.innerHTML = `<strong>${l.name}</strong>`;
+
+      const td2 = document.createElement('td');
+      const b = document.createElement('button');
+      const lab = statusLabel(l.status);
+      b.className = `liftbtn ${lab.cls}`;
+      b.textContent = lab.text;
+      b.addEventListener('click', ()=>{
+        const cur = LS.get('liftStatuses', {});
+        const ns = nextStatus(cur[l.key] || l.status);
+        cur[l.key] = ns;
+        LS.set('liftStatuses', cur);
+        renderLiftTable();
+      });
+      td2.appendChild(b);
+
+      const td3 = document.createElement('td');
+      td3.style.color = 'var(--muted)';
+      td3.style.fontSize = '.9rem';
+      td3.textContent = l.note;
+
+      tr.appendChild(td1); tr.appendChild(td2); tr.appendChild(td3);
+      tbody.appendChild(tr);
+    });
+  }
+  renderLiftTable();
+
+  // ====== OFF-PISTE (planning toggles + local save) ======
+  const offpisteZones = [
+    { key:'combe_gers', name:'Combe de Gers', desc:'High alpine bowl. Best with a guide if you’re not familiar.' },
+    { key:'lindars_veret_bowls', name:'Lindars / Véret side bowls', desc:'Short hikes/entries near upper sectors; conditions vary.' },
+    { key:'trees_samoens', name:'Tree zones toward Samoëns', desc:'Sheltered lines. Great in low visibility and after snow.' },
+    { key:'trees_carroz', name:'Tree zones toward Les Carroz', desc:'Sunny side. Watch return timing across sectors.' },
+  ];
+
+  function renderOffpiste(){
+    const saved = LS.get('offpiste', {});
+    const root = $('offpisteList');
+    root.innerHTML = '';
+
+    offpisteZones.forEach(z => {
+      const row = document.createElement('div');
+      row.className = 'chk';
+
+      const cb = document.createElement('input');
+      cb.type = 'checkbox';
+      cb.checked = !!saved[z.key];
+      cb.addEventListener('change', ()=>{
+        const cur = LS.get('offpiste', {});
+        cur[z.key] = cb.checked;
+        LS.set('offpiste', cur);
+      });
+
+      const txt = document.createElement('div');
+      txt.innerHTML = `<div class="name">${z.name}</div><div class="desc">${z.desc}</div>`;
+
+      row.appendChild(cb);
+      row.appendChild(txt);
+      root.appendChild(row);
+    });
+  }
+  renderOffpiste();
 </script></body>
 </html>
