@@ -95,8 +95,16 @@ iframe{width:100%; border:none; border-radius:14px}
   .col-8,.col-6,.col-4{grid-column: span 12}
   .tiles{grid-template-columns: repeat(2, minmax(0,1fr))}
 }
+  .pdfwrap{border:1px solid var(--ring); border-radius:14px; overflow:hidden; background:rgba(12,59,102,.06)}
+body.dark .pdfwrap{background:rgba(148,163,184,.07)}
+.pdfbar{display:flex; gap:8px; align-items:center; justify-content:space-between; padding:10px 12px; flex-wrap:wrap}
+.pdfbar .left, .pdfbar .right{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
+.pdfbtn{border:1px solid var(--ring); background:transparent; color:var(--text); font-weight:900; padding:8px 10px; border-radius:999px; cursor:pointer}
+.pdfbtn:active{transform:translateY(1px)}
+.pdfmeta{color:var(--muted); font-size:.85rem; font-weight:800}
+canvas#pdfCanvas{width:100%; height:auto; display:block; background:transparent}
 
-  </style>
+</style>
 </head>
 <body>  <div class="topbar">
     <div class="topbar-row">
@@ -178,208 +186,30 @@ iframe{width:100%; border:none; border-radius:14px}
       </div>
     </div>
     <div class="card-b">
-      <iframe src="GM_PlanPistes_25_26_HD_copy.pdf#page=1&zoom=page-width" height="520" loading="lazy"></iframe>
-      <p style="margin:10px 0 0; color:var(--muted); font-size:.9rem">Tip: pinch-zoom on mobile, or tap “Open full map” for the best experience.</p>
-    </div>
-  </div>
-
-  <div class="card col-12">
-    <div class="card-h">
-      <div>
-        <h2>Official live lift & run status (accurate)</h2>
-        <div class="hint">Updated in real time by the slope services</div>
-      </div>
-      <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end">
-        <a class="pill" href="https://www.grand-massif.com/en/information-on-trail-openings/" target="_blank">✅ Open official live status</a>
-        <a class="pill" href="https://www.flaine.com/en/weather-opening/" target="_blank">✅ Flaine live info</a>
-      </div>
-    </div>
-    <div class="card-b">
-      <details open>
-        <summary>
-          <div class="sumrow">
-            <span>Grand Massif (live openings)</span>
-            <span class="chev">⌄</span>
+      <div class="pdfwrap">
+        <div class="pdfbar">
+          <div class="left">
+            <span class="badge" id="pdfStatus">Loading map…</span>
+            <span class="pdfmeta" id="pdfMeta">Page <span id="pdfPage">1</span> / <span id="pdfTotal">--</span></span>
           </div>
-        </summary>
-        <div class="card-b">
-          <iframe src="https://www.grand-massif.com/en/information-on-trail-openings/" height="420" loading="lazy"></iframe>
-          <p style="margin:10px 0 0; color:var(--muted); font-size:.9rem">If the embed is blocked, tap “Open official live status”.</p>
-        </div>
-      </details>
-      <details>
-        <summary>
-          <div class="sumrow">
-            <span>Flaine (live info)</span>
-            <span class="chev">⌄</span>
+          <div class="right">
+            <button class="pdfbtn" id="pdfPrev">◀ Prev</button>
+            <button class="pdfbtn" id="pdfNext">Next ▶</button>
+            <button class="pdfbtn" id="pdfZoomOut">－</button>
+            <button class="pdfbtn" id="pdfZoomIn">＋</button>
+            <button class="pdfbtn" id="pdfFit">Fit</button>
+            <a class="pill" href="GM_PlanPistes_25_26_HD_copy.pdf" target="_blank">📄 Open PDF</a>
           </div>
-        </summary>
-        <div class="card-b">
-          <iframe src="https://www.flaine.com/en/weather-opening/" height="420" loading="lazy"></iframe>
-          <p style="margin:10px 0 0; color:var(--muted); font-size:.9rem">If the embed is blocked, open in a new tab with the button above.</p>
         </div>
-      </details>
+        <canvas id="pdfCanvas"></canvas>
+      </div>
+      <p style="margin:10px 0 0; color:var(--muted); font-size:.9rem">This embedded viewer uses PDF.js so Android doesn’t show the “Open” placeholder. If it still fails, use “Open PDF”.</p>
     </div>
   </div>
 
-  <!-- WEATHER + WEBCAMS -->
-  <div class="card col-6">
-    <div class="card-h">
-      <div>
-        <h2>Live weather (API)</h2>
-        <div class="hint">Fast and readable (temp + condition)</div>
-      </div>
-      <span class="badge" id="wxStatus">--</span>
-    </div>
-    <div class="card-b">
-      <p style="margin:10px 0 10px; color:var(--muted)">This uses OpenWeather. Add your API key in the code to activate.</p>
-      <div class="linkrow" style="margin-top:6px">
-        <a class="pill" href="https://openweathermap.org/api" target="_blank">🔑 Get free API key</a>
-        <a class="pill" href="https://www.snow-forecast.com/resorts/Flaine/snow-report" target="_blank">❄️ Snow report (backup)</a>
-      </div>
-    </div>
-  </div>
-
-  <div class="card col-6">
-    <div class="card-h">
-      <div>
-        <h2>Webcams</h2>
-        <div class="hint">Use this to judge visibility & wind</div>
-      </div>
-      <span class="badge">Tap link if embed blocks</span>
-    </div>
-    <div class="card-b">
-      <iframe src="https://www.flaine.com/en/webcams/" height="260" loading="lazy"></iframe>
-    </div>
-  </div>
-
-  <!-- LIFTS (CROWDSOURCED) -->
-  <div class="card col-8">
-    <div class="card-h">
-      <div>
-        <h2>Group lift notes (optional)</h2>
-        <div class="hint">This is NOT official — use it for your group’s notes. Official live status is above.</div>
-      </div>
-      <span class="badge" id="liftSaved">Saved locally</span>
-    </div>
-    <div class="card-b">
-      <table>
-        <thead>
-          <tr><th>Lift (Flaine)</th><th>Status</th><th>Note</th></tr>
-        </thead>
-        <tbody id="liftTable"></tbody>
-      </table>
-      <p style="margin:10px 0 0; color:var(--muted); font-size:.9rem">
-        Tip: if wind is strong, expect upper lifts (e.g., Grandes Platières / Lindars) to close first.
-      </p>
-    </div>
-  </div>
-
-  <!-- RETURN SAFETY -->
-  <div class="card col-4">
-    <div class="card-h">
-      <div>
-        <h2>Return safety</h2>
-        <div class="hint">Avoid being stranded across sectors</div>
-      </div>
-      <span class="badge warn">Time critical</span>
-    </div>
-    <div class="card-b">
-      <table>
-        <thead><tr><th>Where you are</th><th>Action</th></tr></thead>
-        <tbody>
-          <tr><td><strong>Flaine</strong></td><td><span class="badge ok">Safe base</span></td></tr>
-          <tr><td><strong>Samoëns</strong></td><td><span class="badge warn">Return early</span></td></tr>
-          <tr><td><strong>Les Carroz</strong></td><td><span class="badge warn">Watch time</span></td></tr>
-          <tr><td><strong>Morillon</strong></td><td><span class="badge bad">Don’t push after 15:30</span></td></tr>
-        </tbody>
-      </table>
-      <p style="margin:10px 0 0; color:var(--muted); font-size:.9rem">Rule of thumb: if you’re outside Flaine after <strong>15:30</strong>, start returning immediately.</p>
-    </div>
-  </div>
-
-  <!-- OFF-PISTE OVERLAY (PLANNING) -->
-  <div class="card col-12">
-    <div class="card-h">
-      <div>
-        <h2>Off-piste overlay (planning toggle)</h2>
-        <div class="hint">Helps you locate key zones on the maps (not GPS)</div>
-      </div>
-      <span class="badge bad">Avalanche risk</span>
-    </div>
-    <div class="card-b">
-      <div class="linkrow" style="margin-bottom:10px">
-        <a class="pill" href="https://www.google.com/maps/search/Combe+de+Gers" target="_blank">🧭 Combe de Gers (map)</a>
-        <a class="pill" href="https://www.flaine.com/en/piste-map/" target="_blank">🗺️ Open piste map</a>
-      </div>
-
-      <div class="checklist" id="offpisteList"></div>
-
-      <details>
-        <summary>
-          <div class="sumrow">
-            <span>Safety reminders (read before going)</span>
-            <span class="chev">⌄</span>
-          </div>
-        </summary>
-        <div class="card-b">
-          <ul style="margin:0; padding-left:18px; color:var(--muted)">
-            <li>Carry beacon/shovel/probe and know how to use them.</li>
-            <li>Check avalanche bulletin & wind loading before committing.</li>
-            <li>If you’re unsure, hire a local guide/instructor for the day.</li>
-          </ul>
-        </div>
-      </details>
-    </div>
-  </div>
-
-  <!-- SETTINGS -->
-  <div class="card col-12">
-    <div class="card-h">
-      <div>
-        <h2>Settings</h2>
-        <div class="hint">Make the dashboard match the day</div>
-      </div>
-      <span class="badge">1-minute setup</span>
-    </div>
-    <div class="card-b">
-      <div class="grid" style="gap:10px">
-        <div class="col-6">
-          <label style="font-weight:900; font-size:.9rem">Last lift time</label>
-          <input id="lastLift" type="time" value="16:30" style="width:100%; padding:12px; border-radius:12px; border:1px solid var(--ring); background:transparent; color:var(--text); font-weight:900; margin-top:6px">
-          <div style="color:var(--muted); font-size:.85rem; margin-top:6px">Update this if signage says a different last lift time.</div>
-        </div>
-        <div class="col-6">
-          <label style="font-weight:900; font-size:.9rem">Return warning time</label>
-          <input id="returnWarn" type="time" value="15:30" style="width:100%; padding:12px; border-radius:12px; border:1px solid var(--ring); background:transparent; color:var(--text); font-weight:900; margin-top:6px">
-          <div style="color:var(--muted); font-size:.85rem; margin-top:6px">If you’re outside Flaine after this time, start returning.</div>
-        </div>
-        <div class="col-12" style="display:flex; gap:10px; flex-wrap:wrap; margin-top:6px">
-          <button class="btn" style="background:var(--brand);" id="saveSettings">💾 Save settings</button>
-          <button class="btn secondary" id="resetLocal">🧹 Reset local data</button>
-        </div>
-      </div>
-
-      <details style="margin-top:12px">
-        <summary>
-          <div class="sumrow">
-            <span>Enable real weather (OpenWeather API key)</span>
-            <span class="chev">⌄</span>
-          </div>
-        </summary>
-        <div class="card-b">
-          <p style="margin-top:0; color:var(--muted)">Open the HTML and replace <code>YOUR_API_KEY</code> with your key. Flaine coordinates are prefilled. Refresh after saving.</p>
-          <pre style="margin:0; padding:12px; border-radius:14px; border:1px solid var(--ring); overflow:auto; background:rgba(12,59,102,.06)"><code>const OPENWEATHER_KEY = "YOUR_API_KEY";</code></pre>
-        </div>
-      </details>
-    </div>
-  </div>
-
-</div>
-
-  </div>  <footer style="text-align:center; padding:14px 10px; color:var(--muted)">
+  <footer style="text-align:center; padding:14px 10px; color:var(--muted)">
     Tip: Add this page to Android Home Screen after hosting (GitHub Pages) for one-tap access.
-  </footer><script>
+  </footer><script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.3.136/pdf.min.js"></script><script>
   // ====== CONFIG ======
   // Flaine approximate coords (center of resort). You can refine if you want.
   const FLAINE = { lat: 46.001, lon: 6.688 };
@@ -426,6 +256,127 @@ iframe{width:100%; border:none; border-radius:14px}
     localStorage.removeItem('offpiste');
     renderLiftTable();
     renderOffpiste();
+
+  // ====== EMBEDDED PDF MAP (PDF.js) ======
+  const PDF_URL = 'GM_PlanPistes_25_26_HD_copy.pdf';
+  let pdfDoc = null;
+  let pdfPageNum = 1;
+  let pdfScale = 1.2;
+  let pdfFitMode = true;
+
+  function setPdfStatus(text, type){
+    const el = $('pdfStatus');
+    if(!el) return;
+    el.textContent = text;
+    el.className = 'badge' + (type ? (' ' + type) : '');
+  }
+
+  async function loadPdf(){
+    const canvas = $('pdfCanvas');
+    if(!canvas) return;
+
+    try{
+      // Worker setup
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.3.136/pdf.worker.min.js';
+
+      setPdfStatus('Loading map…', 'warn');
+      pdfDoc = await pdfjsLib.getDocument({ url: PDF_URL }).promise;
+      $('pdfTotal').textContent = pdfDoc.numPages;
+      pdfPageNum = Math.min(pdfPageNum, pdfDoc.numPages);
+      await renderPdfPage();
+      setPdfStatus('Map ready', 'ok');
+    } catch (e){
+      setPdfStatus('Map failed (use Open PDF)', 'bad');
+      console.error(e);
+    }
+  }
+
+  function calcFitScale(viewport, canvas){
+    const containerWidth = canvas.parentElement.clientWidth;
+    // leave a little padding
+    return (containerWidth / viewport.width) * 0.98;
+  }
+
+  async function renderPdfPage(){
+    if(!pdfDoc) return;
+    const canvas = $('pdfCanvas');
+    const ctx = canvas.getContext('2d');
+    $('pdfPage').textContent = pdfPageNum;
+
+    const page = await pdfDoc.getPage(pdfPageNum);
+    const baseViewport = page.getViewport({ scale: 1 });
+
+    // Fit-to-width by default
+    if(pdfFitMode){
+      pdfScale = calcFitScale(baseViewport, canvas);
+    }
+
+    const viewport = page.getViewport({ scale: pdfScale });
+
+    // HiDPI support
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = Math.floor(viewport.width * dpr);
+    canvas.height = Math.floor(viewport.height * dpr);
+    canvas.style.width = viewport.width + 'px';
+    canvas.style.height = viewport.height + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    await page.render({ canvasContext: ctx, viewport }).promise;
+
+    $('pdfMeta').innerHTML = `Page <span id="pdfPage">${pdfPageNum}</span> / <span id="pdfTotal">${pdfDoc.numPages}</span>`;
+  }
+
+  function clampPage(){
+    if(!pdfDoc) return;
+    pdfPageNum = Math.max(1, Math.min(pdfPageNum, pdfDoc.numPages));
+  }
+
+  function hookPdfControls(){
+    const prev = $('pdfPrev');
+    const next = $('pdfNext');
+    const zin  = $('pdfZoomIn');
+    const zout = $('pdfZoomOut');
+    const fit  = $('pdfFit');
+
+    if(prev) prev.addEventListener('click', async ()=>{
+      if(!pdfDoc) return;
+      pdfPageNum--; clampPage();
+      await renderPdfPage();
+    });
+    if(next) next.addEventListener('click', async ()=>{
+      if(!pdfDoc) return;
+      pdfPageNum++; clampPage();
+      await renderPdfPage();
+    });
+    if(zin) zin.addEventListener('click', async ()=>{
+      if(!pdfDoc) return;
+      pdfFitMode = false;
+      pdfScale = Math.min(pdfScale + 0.15, 3.0);
+      await renderPdfPage();
+    });
+    if(zout) zout.addEventListener('click', async ()=>{
+      if(!pdfDoc) return;
+      pdfFitMode = false;
+      pdfScale = Math.max(pdfScale - 0.15, 0.6);
+      await renderPdfPage();
+    });
+    if(fit) fit.addEventListener('click', async ()=>{
+      if(!pdfDoc) return;
+      pdfFitMode = true;
+      await renderPdfPage();
+    });
+
+    // Re-fit on rotate / resize
+    window.addEventListener('resize', ()=>{
+      if(!pdfDoc) return;
+      if(pdfFitMode){
+        renderPdfPage();
+      }
+    });
+  }
+
+  hookPdfControls();
+  loadPdf();
   });
 
   // ====== COUNTDOWN ======
@@ -554,67 +505,4 @@ iframe{width:100%; border:none; border-radius:14px}
     rows.forEach(l => {
       const tr = document.createElement('tr');
       const td1 = document.createElement('td');
-      td1.innerHTML = `<strong>${l.name}</strong>`;
-
-      const td2 = document.createElement('td');
-      const b = document.createElement('button');
-      const lab = statusLabel(l.status);
-      b.className = `liftbtn ${lab.cls}`;
-      b.textContent = lab.text;
-      b.addEventListener('click', ()=>{
-        const cur = LS.get('liftStatuses', {});
-        const ns = nextStatus(cur[l.key] || l.status);
-        cur[l.key] = ns;
-        LS.set('liftStatuses', cur);
-        renderLiftTable();
-      });
-      td2.appendChild(b);
-
-      const td3 = document.createElement('td');
-      td3.style.color = 'var(--muted)';
-      td3.style.fontSize = '.9rem';
-      td3.textContent = l.note;
-
-      tr.appendChild(td1); tr.appendChild(td2); tr.appendChild(td3);
-      tbody.appendChild(tr);
-    });
-  }
-  renderLiftTable();
-
-  // ====== OFF-PISTE (planning toggles + local save) ======
-  const offpisteZones = [
-    { key:'combe_gers', name:'Combe de Gers', desc:'High alpine bowl. Best with a guide if you’re not familiar.' },
-    { key:'lindars_veret_bowls', name:'Lindars / Véret side bowls', desc:'Short hikes/entries near upper sectors; conditions vary.' },
-    { key:'trees_samoens', name:'Tree zones toward Samoëns', desc:'Sheltered lines. Great in low visibility and after snow.' },
-    { key:'trees_carroz', name:'Tree zones toward Les Carroz', desc:'Sunny side. Watch return timing across sectors.' },
-  ];
-
-  function renderOffpiste(){
-    const saved = LS.get('offpiste', {});
-    const root = $('offpisteList');
-    root.innerHTML = '';
-
-    offpisteZones.forEach(z => {
-      const row = document.createElement('div');
-      row.className = 'chk';
-
-      const cb = document.createElement('input');
-      cb.type = 'checkbox';
-      cb.checked = !!saved[z.key];
-      cb.addEventListener('change', ()=>{
-        const cur = LS.get('offpiste', {});
-        cur[z.key] = cb.checked;
-        LS.set('offpiste', cur);
-      });
-
-      const txt = document.createElement('div');
-      txt.innerHTML = `<div class="name">${z.name}</div><div class="desc">${z.desc}</div>`;
-
-      row.appendChild(cb);
-      row.appendChild(txt);
-      root.appendChild(row);
-    });
-  }
-  renderOffpiste();
-</script></body>
-</html>
+      td1.innerH
