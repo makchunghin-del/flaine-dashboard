@@ -165,6 +165,63 @@ iframe{width:100%; border:none; border-radius:14px}
     </details>
   </div>
 
+  <!-- MAP (PDF) + OFFICIAL LIVE STATUS -->
+  <div class="card col-12">
+    <div class="card-h">
+      <div>
+        <h2>Piste map (your PDF)</h2>
+        <div class="hint">Embedded map for quick reference (upload PDF next to index.html)</div>
+      </div>
+      <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end">
+        <a class="pill" href="GM_PlanPistes_25_26_HD_copy.pdf" target="_blank">🗺️ Open full map</a>
+        <a class="pill" href="https://www.grand-massif.com/en/trail-map/" target="_blank">🌐 Official map page</a>
+      </div>
+    </div>
+    <div class="card-b">
+      <iframe src="GM_PlanPistes_25_26_HD_copy.pdf#page=1&zoom=page-width" height="520" loading="lazy"></iframe>
+      <p style="margin:10px 0 0; color:var(--muted); font-size:.9rem">Tip: pinch-zoom on mobile, or tap “Open full map” for the best experience.</p>
+    </div>
+  </div>
+
+  <div class="card col-12">
+    <div class="card-h">
+      <div>
+        <h2>Official live lift & run status (accurate)</h2>
+        <div class="hint">Updated in real time by the slope services</div>
+      </div>
+      <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end">
+        <a class="pill" href="https://www.grand-massif.com/en/information-on-trail-openings/" target="_blank">✅ Open official live status</a>
+        <a class="pill" href="https://www.flaine.com/en/weather-opening/" target="_blank">✅ Flaine live info</a>
+      </div>
+    </div>
+    <div class="card-b">
+      <details open>
+        <summary>
+          <div class="sumrow">
+            <span>Grand Massif (live openings)</span>
+            <span class="chev">⌄</span>
+          </div>
+        </summary>
+        <div class="card-b">
+          <iframe src="https://www.grand-massif.com/en/information-on-trail-openings/" height="420" loading="lazy"></iframe>
+          <p style="margin:10px 0 0; color:var(--muted); font-size:.9rem">If the embed is blocked, tap “Open official live status”.</p>
+        </div>
+      </details>
+      <details>
+        <summary>
+          <div class="sumrow">
+            <span>Flaine (live info)</span>
+            <span class="chev">⌄</span>
+          </div>
+        </summary>
+        <div class="card-b">
+          <iframe src="https://www.flaine.com/en/weather-opening/" height="420" loading="lazy"></iframe>
+          <p style="margin:10px 0 0; color:var(--muted); font-size:.9rem">If the embed is blocked, open in a new tab with the button above.</p>
+        </div>
+      </details>
+    </div>
+  </div>
+
   <!-- WEATHER + WEBCAMS -->
   <div class="card col-6">
     <div class="card-h">
@@ -200,8 +257,8 @@ iframe{width:100%; border:none; border-radius:14px}
   <div class="card col-8">
     <div class="card-h">
       <div>
-        <h2>Lift status (tap to update)</h2>
-        <div class="hint">For your group: quick OPEN/CLOSED/UNKNOWN — saved on your phone</div>
+        <h2>Group lift notes (optional)</h2>
+        <div class="hint">This is NOT official — use it for your group’s notes. Official live status is above.</div>
       </div>
       <span class="badge" id="liftSaved">Saved locally</span>
     </div>
