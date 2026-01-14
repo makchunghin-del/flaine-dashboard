@@ -1,91 +1,105 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Flaine & Grand Massif Snowboard Dashboard</title><style>
-  :root{
-    --bg:#eef2f7; --card:#ffffff; --text:#0b1220; --muted:#5b6575;
-    --brand:#0c3b66; --brand2:#0a2f52;
-    --ok:#0f7b3a; --bad:#c62828; --warn:#b26a00;
-    --ring: rgba(12,59,102,.18);
-    --shadow: 0 10px 22px rgba(0,0,0,.08);
-    --radius:16px;
-  }
-  body.dark{
-    --bg:#0b1220; --card:#0f172a; --text:#e8eefc; --muted:#a9b4c7;
-    --brand:#1b3d6b; --brand2:#0b223f;
-    --ring: rgba(148,163,184,.18);
-    --shadow: 0 10px 22px rgba(0,0,0,.35);
-  }
-  *{box-sizing:border-box}
-  body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;background:var(--bg);color:var(--text)}
+<title>Flaine & Grand Massif Snowboard Dashboard</title>
 
-  /* Top bar */
-  .topbar{position:sticky;top:0;z-index:10;background:linear-gradient(90deg,var(--brand),var(--brand2));color:#fff;padding:14px 16px}
-  .topbar-row{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
-  .title h1{margin:0;font-size:1.1rem}
-  .title .sub{font-size:.85rem;opacity:.9}
-  .btn{border:none;border-radius:999px;padding:10px 12px;background:rgba(255,255,255,.14);color:#fff;font-weight:700;cursor:pointer}
-  .btn.secondary{background:rgba(255,255,255,.1)}
+<style>
+:root{
+  --bg:#eef2f7; --card:#ffffff; --text:#0b1220; --muted:#5b6575;
+  --brand:#0c3b66; --brand2:#0a2f52;
+  --ok:#0f7b3a; --bad:#c62828; --warn:#b26a00;
+  --ring: rgba(12,59,102,.18);
+  --shadow: 0 10px 22px rgba(0,0,0,.08);
+  --radius:16px;
+}
+body.dark{
+  --bg:#0b1220; --card:#0f172a; --text:#e8eefc; --muted:#a9b4c7;
+  --brand:#1b3d6b; --brand2:#0b223f;
+  --ring: rgba(148,163,184,.18);
+  --shadow: 0 10px 22px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;background:var(--bg);color:var(--text)}
 
-  /* Layout */
-  .wrap{padding:14px;max-width:1200px;margin:auto}
-  .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:12px}
-  .card{background:var(--card);border-radius:16px;box-shadow:var(--shadow);border:1px solid var(--ring)}
-  .card-h{padding:12px 14px;display:flex;justify-content:space-between;gap:10px}
-  .card-b{padding:12px 14px}
+.topbar{
+  position:sticky;top:0;z-index:10;
+  background:linear-gradient(90deg,var(--brand),var(--brand2));
+  color:#fff;padding:14px 16px
+}
+.topbar-row{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.btn{border:none;border-radius:999px;padding:10px 12px;background:rgba(255,255,255,.14);color:#fff;font-weight:800;cursor:pointer}
+.btn.secondary{background:rgba(255,255,255,.1)}
 
-  .badge{border:1px solid var(--ring);border-radius:999px;padding:6px 10px;font-weight:800;font-size:.8rem}
-  .badge.ok{color:var(--ok)} .badge.warn{color:var(--warn)} .badge.bad{color:var(--bad)}
+.wrap{padding:14px;max-width:1200px;margin:auto}
+.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:12px}
+.card{background:var(--card);border-radius:16px;box-shadow:var(--shadow);border:1px solid var(--ring)}
+.card-h{padding:12px 14px;display:flex;justify-content:space-between;gap:10px;align-items:center}
+.card-b{padding:12px 14px}
 
-  .tiles{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
-  .tile{padding:12px;border-radius:14px;border:1px solid var(--ring);background:rgba(12,59,102,.06)}
-  body.dark .tile{background:rgba(148,163,184,.07)}
-  .tile .k{font-size:.8rem;color:var(--muted)}
-  .tile .v{font-size:1.25rem;font-weight:900}
+.badge{border:1px solid var(--ring);border-radius:999px;padding:6px 10px;font-weight:800;font-size:.8rem}
+.badge.ok{color:var(--ok)} .badge.warn{color:var(--warn)} .badge.bad{color:var(--bad)}
 
-  a{color:var(--brand);font-weight:800;text-decoration:none}
-  .pill{border:1px solid var(--ring);border-radius:999px;padding:8px 12px;display:inline-flex;gap:8px}
+.tiles{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.tile{padding:12px;border-radius:14px;border:1px solid var(--ring);background:rgba(12,59,102,.06)}
+body.dark .tile{background:rgba(148,163,184,.07)}
+.tile .k{font-size:.8rem;color:var(--muted)}
+.tile .v{font-size:1.25rem;font-weight:900}
 
-  table{width:100%;border-collapse:collapse}
-  th,td{padding:8px;border-bottom:1px solid var(--ring)}
-  th{font-size:.8rem;color:var(--muted)}
+.settings{display:grid;gap:10px}
+.settings label{font-weight:900;font-size:.85rem}
+.settings input{padding:8px 10px;border-radius:10px;border:1px solid var(--ring);font-weight:800}
 
-  .liftbtn{border:none;border-radius:999px;padding:8px 12px;font-weight:900;cursor:pointer}
-  .liftbtn.open{background:rgba(15,123,58,.15);color:var(--ok)}
-  .liftbtn.closed{background:rgba(198,40,40,.15);color:var(--bad)}
-  .liftbtn.unknown{background:rgba(178,106,0,.15);color:var(--warn)}
+table{width:100%;border-collapse:collapse}
+th,td{padding:8px;border-bottom:1px solid var(--ring)}
+th{font-size:.8rem;color:var(--muted)}
 
-  .chk{display:flex;gap:10px;padding:10px;border:1px solid var(--ring);border-radius:14px}
+.liftbtn{border:none;border-radius:999px;padding:8px 12px;font-weight:900;cursor:pointer}
+.liftbtn.open{background:rgba(15,123,58,.15);color:var(--ok)}
+.liftbtn.closed{background:rgba(198,40,40,.15);color:var(--bad)}
+.liftbtn.unknown{background:rgba(178,106,0,.15);color:var(--warn)}
 
-  /* Settings */
-  .settings{display:grid;gap:10px}
-  .settings label{font-weight:800;font-size:.85rem}
-  .settings input{padding:8px 10px;border-radius:10px;border:1px solid var(--ring);font-weight:700}
-  .settings .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.chk{display:flex;gap:10px;padding:10px;border:1px solid var(--ring);border-radius:14px}
 
-  /* PDF */
-  .pdfwrap{border:1px solid var(--ring);border-radius:14px;overflow:hidden}
-  .pdfbar{display:flex;justify-content:space-between;gap:8px;padding:10px;background:rgba(12,59,102,.06)}
-  body.dark .pdfbar{background:rgba(148,163,184,.07)}
-  .pdfbtn{border:1px solid var(--ring);border-radius:999px;padding:6px 10px;font-weight:900;cursor:pointer;background:transparent}
-  canvas{width:100%;display:block;background:#fff}
+iframe{
+  width:100%;
+  border:1px solid var(--ring);
+  border-radius:14px;
+  background:#fff;
+}
 
-  .col-12{grid-column:span 12}
-  @media(max-width:860px){.tiles{grid-template-columns:1fr}}
-</style></head><body><div class="topbar">
+.pdfwrap{border:1px solid var(--ring);border-radius:14px;overflow:hidden}
+.pdfbar{display:flex;justify-content:space-between;gap:8px;padding:10px;background:rgba(12,59,102,.06)}
+body.dark .pdfbar{background:rgba(148,163,184,.07)}
+.pdfbtn{border:1px solid var(--ring);border-radius:999px;padding:6px 10px;font-weight:900;background:transparent;cursor:pointer}
+canvas{width:100%;display:block;background:#fff}
+
+.col-12{grid-column:span 12}
+@media(max-width:860px){.tiles{grid-template-columns:1fr}}
+</style>
+</head>
+
+<body>
+
+<div class="topbar">
   <div class="topbar-row">
-    <div class="title">
-      <h1>Flaine & Grand Massif</h1>
-      <div class="sub">Weather • Lifts • Map • Off-piste • Return timing</div>
+    <div>
+      <strong>Flaine & Grand Massif</strong><br>
+      <span style="font-size:.85rem;opacity:.9">Weather • Lifts • Maps • Return timing</span>
     </div>
     <div>
       <button class="btn" id="darkBtn">🌙 Dark</button>
       <button class="btn secondary" id="refreshBtn">🔄 Refresh</button>
     </div>
   </div>
-</div><div class="wrap">
-<div class="grid"><!-- AT A GLANCE --><div class="card col-12">
+</div>
+
+<div class="wrap">
+<div class="grid">
+
+<!-- AT A GLANCE -->
+<div class="card col-12">
   <div class="card-h">
     <strong>Today at a glance</strong>
     <div>
@@ -100,20 +114,45 @@
     <div class="tile"><div class="k">Last lift in</div><div class="v" id="countdown">--</div></div>
     <div class="tile"><div class="k">Lunch crowd</div><div class="v">12–14</div></div>
   </div>
-</div><!-- SETTINGS --><div class="card col-12">
+</div>
+
+<!-- SETTINGS -->
+<div class="card col-12">
   <div class="card-h"><strong>Settings</strong></div>
   <div class="card-b settings">
-    <div class="row">
-      <label for="lastLift">Last lift time</label>
-      <input type="time" id="lastLift" />
-      <label for="returnWarn">Return warning</label>
-      <input type="time" id="returnWarn" />
+    <label>Last lift time <input type="time" id="lastLift"></label>
+    <label>Return warning <input type="time" id="returnWarn"></label>
+    <div>
       <button class="btn secondary" id="saveSettings">Save</button>
       <button class="btn secondary" id="resetSettings">Reset</button>
     </div>
   </div>
-</div><!-- MAP --><div class="card col-12">
-  <div class="card-h"><strong>Piste map (embedded)</strong></div>
+</div>
+
+<!-- OFFICIAL STATUS EMBED -->
+<div class="card col-12">
+  <div class="card-h">
+    <strong>Official Lift & Piste Status</strong>
+    <span class="badge ok">Live (official)</span>
+  </div>
+  <div class="card-b">
+    <p style="color:var(--muted);font-size:.9rem;margin-top:0">
+      Direct from resort websites. Use this for real lift decisions.
+    </p>
+
+    <strong>Flaine – Opening Status</strong>
+    <iframe src="https://www.flaine.com/en/weather-opening/" loading="lazy" style="height:520px"></iframe>
+
+    <div style="height:12px"></div>
+
+    <strong>Grand Massif – Lift & Piste Map</strong>
+    <iframe src="https://www.grand-massif.com/en/trail-map/" loading="lazy" style="height:520px"></iframe>
+  </div>
+</div>
+
+<!-- EMBEDDED PDF MAP -->
+<div class="card col-12">
+  <div class="card-h"><strong>Piste map (PDF)</strong></div>
   <div class="card-b">
     <div class="pdfwrap">
       <div class="pdfbar">
@@ -124,89 +163,103 @@
           <button class="pdfbtn" id="zoomOut">－</button>
           <button class="pdfbtn" id="zoomIn">＋</button>
           <button class="pdfbtn" id="fit">Fit</button>
-          <a class="pill" href="GM_PlanPistes_25_26_HD_copy.pdf" target="_blank">Open PDF</a>
+          <a class="badge" href="GM_PlanPistes_25_26_HD_copy.pdf" target="_blank">Open PDF</a>
         </div>
       </div>
       <canvas id="pdfCanvas"></canvas>
     </div>
   </div>
-</div><!-- LIFTS --><div class="card col-12">
-  <div class="card-h"><strong>Lifts (tap to update)</strong></div>
+</div>
+
+<!-- LIFTS (CROWDSOURCED) -->
+<div class="card col-12">
+  <div class="card-h"><strong>Lifts (on-hill check)</strong></div>
   <div class="card-b">
     <table>
       <thead><tr><th>Lift</th><th>Status</th><th>Note</th></tr></thead>
       <tbody id="liftTable"></tbody>
     </table>
   </div>
-</div><!-- OFF-PISTE --><div class="card col-12">
+</div>
+
+<!-- OFF-PISTE -->
+<div class="card col-12">
   <div class="card-h"><strong>Off-piste planning</strong></div>
   <div class="card-b" id="offpisteList"></div>
-</div></div>
-</div><script type="module">
+</div>
+
+</div>
+</div>
+
+<script type="module">
 import * as pdfjsLib from './pdf.mjs';
-pdfjsLib.GlobalWorkerOptions.workerSrc = new URL('./pdf.worker.mjs', import.meta.url).toString();
+pdfjsLib.GlobalWorkerOptions.workerSrc =
+  new URL('./pdf.worker.mjs', import.meta.url).toString();
 
 const $ = id => document.getElementById(id);
 const LS = {get:(k,d)=>JSON.parse(localStorage.getItem(k)||JSON.stringify(d)),set:(k,v)=>localStorage.setItem(k,JSON.stringify(v))};
 
-// Dark mode
+// Dark
 $('darkBtn').onclick=()=>document.body.classList.toggle('dark');
 
-// Loaded time
+// Loaded badge
 function loaded(){ $('loadedAt').textContent='Loaded '+new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}); }
 loaded();
 
 // SETTINGS
-const DEFAULTS = { lastLift:'16:30', returnWarn:'15:30' };
+const DEFAULTS={lastLift:'16:30',returnWarn:'15:30'};
 function loadSettings(){
-  const s = LS.get('settings', DEFAULTS);
-  $('lastLift').value = s.lastLift;
-  $('returnWarn').value = s.returnWarn;
+  const s=LS.get('settings',DEFAULTS);
+  $('lastLift').value=s.lastLift;
+  $('returnWarn').value=s.returnWarn;
   updateTimers();
 }
-function saveSettings(){
-  const s = { lastLift: $('lastLift').value || DEFAULTS.lastLift, returnWarn: $('returnWarn').value || DEFAULTS.returnWarn };
-  LS.set('settings', s);
-  updateTimers();
-}
-function resetSettings(){
-  LS.set('settings', DEFAULTS);
-  loadSettings();
-}
-$('saveSettings').onclick = saveSettings;
-$('resetSettings').onclick = resetSettings;
+$('saveSettings').onclick=()=>{LS.set('settings',{lastLift:$('lastLift').value,returnWarn:$('returnWarn').value});updateTimers();};
+$('resetSettings').onclick=()=>{LS.set('settings',DEFAULTS);loadSettings();};
 
-// TIMERS
+// Timers
 function updateTimers(){
-  const s = LS.get('settings', DEFAULTS);
-  const now = new Date();
+  const s=LS.get('settings',DEFAULTS), now=new Date();
+  let [h,m]=s.lastLift.split(':').map(Number);
+  let t=new Date(); t.setHours(h,m,0,0);
+  let d=t-now;
+  $('countdown').textContent=d<=0?'Closed':Math.floor(d/60000/60)+'h '+Math.floor(d/60000)%60+'m';
+  $('liftCountdownBadge').textContent='Last lift '+s.lastLift;
 
-  // Last lift
-  const [lh,lm] = s.lastLift.split(':').map(Number);
-  const last = new Date(); last.setHours(lh,lm,0,0);
-  const diff = last - now;
-  $('countdown').textContent = diff<=0 ? 'Closed' : Math.floor(diff/60000/60)+'h '+Math.floor(diff/60000)%60+'m';
-  $('liftCountdownBadge').textContent = 'Last lift '+s.lastLift;
-
-  // Return warn
-  const [rh,rm] = s.returnWarn.split(':').map(Number);
-  const warn = new Date(); warn.setHours(rh,rm,0,0);
-  $('returnBadge').textContent = warn-now<=0 ? 'RETURN NOW' : 'Return '+s.returnWarn;
+  [h,m]=s.returnWarn.split(':').map(Number);
+  t=new Date(); t.setHours(h,m,0,0);
+  $('returnBadge').textContent=t-now<=0?'RETURN NOW':'Return '+s.returnWarn;
 }
 setInterval(updateTimers,30000);
 
-// WEATHER
+// Weather (optional)
 const KEY='YOUR_API_KEY', FLAINE={lat:46.001,lon:6.688};
-async function weather(){ if(KEY==='YOUR_API_KEY') return; const r=await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${FLAINE.lat}&lon=${FLAINE.lon}&units=metric&appid=${KEY}`); const d=await r.json(); $('wxMain').textContent=Math.round(d.main.temp)+'°C'; $('wxWind').textContent=d.wind.speed.toFixed(1)+' m/s'; }
+async function weather(){
+  if(KEY==='YOUR_API_KEY') return;
+  const r=await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${FLAINE.lat}&lon=${FLAINE.lon}&units=metric&appid=${KEY}`);
+  const d=await r.json();
+  $('wxMain').textContent=Math.round(d.main.temp)+'°C';
+  $('wxWind').textContent=d.wind.speed.toFixed(1)+' m/s';
+}
 weather();
 
-// PDF MAP
+// PDF
 const PDF='GM_PlanPistes_25_26_HD_copy.pdf';
 let pdf,page=1,scale=0.9,fit=true;
 const DPR=Math.min(devicePixelRatio||1,1.5);
 const canvas=$('pdfCanvas'),ctx=canvas.getContext('2d');
-async function render(){ const p=await pdf.getPage(page); const base=p.getViewport({scale:1}); if(fit){scale=(canvas.parentElement.clientWidth/base.width)*0.98;} const vp=p.getViewport({scale}); canvas.width=vp.width*DPR; canvas.height=vp.height*DPR; canvas.style.width=vp.width+'px'; canvas.style.height=vp.height+'px'; ctx.setTransform(DPR,0,0,DPR,0,0); await p.render({canvasContext:ctx,viewport:vp}).promise; $('pdfStatus').textContent='Ready'; }
-async function loadPdf(){ $('pdfStatus').textContent='Loading…'; pdf=await pdfjsLib.getDocument(PDF).promise; await render(); }
+async function render(){
+  const p=await pdf.getPage(page);
+  const base=p.getViewport({scale:1});
+  if(fit) scale=(canvas.parentElement.clientWidth/base.width)*0.98;
+  const vp=p.getViewport({scale});
+  canvas.width=vp.width*DPR; canvas.height=vp.height*DPR;
+  canvas.style.width=vp.width+'px'; canvas.style.height=vp.height+'px';
+  ctx.setTransform(DPR,0,0,DPR,0,0);
+  await p.render({canvasContext:ctx,viewport:vp}).promise;
+  $('pdfStatus').textContent='Ready';
+}
+async function loadPdf(){ pdf=await pdfjsLib.getDocument(PDF).promise; render(); }
 $('prev').onclick=()=>{if(page>1){page--;render();}};
 $('next').onclick=()=>{if(page<pdf.numPages){page++;render();}};
 $('zoomIn').onclick=()=>{fit=false;scale+=0.15;render();};
@@ -214,17 +267,38 @@ $('zoomOut').onclick=()=>{fit=false;scale=Math.max(0.6,scale-0.15);render();};
 $('fit').onclick=()=>{fit=true;render();};
 setTimeout(loadPdf,300);
 
-// LIFTS
+// Lifts
 const lifts=[['gp','Grandes Platières'],['veret','Véret'],['aup','Aup de Véran'],['lin','Lindars Nord']];
-function renderLifts(){ const s=LS.get('lifts',{}), tb=$('liftTable'); tb.innerHTML=''; lifts.forEach(([k,n])=>{ const st=s[k]||'unknown'; const b=document.createElement('button'); b.className='liftbtn '+st; b.textContent=st.toUpperCase(); b.onclick=()=>{s[k]=st==='unknown'?'open':st==='open'?'closed':'unknown'; LS.set('lifts',s); renderLifts();}; const tr=document.createElement('tr'); tr.innerHTML=`<td>${n}</td><td></td><td>On-hill observation</td>`; tr.children[1].appendChild(b); tb.appendChild(tr); }); }
+function renderLifts(){
+  const s=LS.get('lifts',{}),tb=$('liftTable');tb.innerHTML='';
+  lifts.forEach(([k,n])=>{
+    const st=s[k]||'unknown';
+    const b=document.createElement('button');
+    b.className='liftbtn '+st; b.textContent=st.toUpperCase();
+    b.onclick=()=>{s[k]=st==='unknown'?'open':st==='open'?'closed':'unknown';LS.set('lifts',s);renderLifts();};
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td>${n}</td><td></td><td>On-hill observation</td>`;
+    tr.children[1].appendChild(b); tb.appendChild(tr);
+  });
+}
 renderLifts();
 
-// OFF-PISTE
+// Off-piste
 const zones=['Combe de Gers','Trees toward Samoëns','Trees toward Carroz'];
-function renderOff(){ const s=LS.get('off',{}), r=$('offpisteList'); r.innerHTML=''; zones.forEach(z=>{ const row=document.createElement('div'); row.className='chk'; const cb=document.createElement('input'); cb.type='checkbox'; cb.checked=!!s[z]; cb.onchange=()=>{s[z]=cb.checked; LS.set('off',s);}; row.appendChild(cb); row.appendChild(document.createTextNode(z)); r.appendChild(row); }); }
+function renderOff(){
+  const s=LS.get('off',{}),r=$('offpisteList');r.innerHTML='';
+  zones.forEach(z=>{
+    const row=document.createElement('div');row.className='chk';
+    const cb=document.createElement('input');cb.type='checkbox';cb.checked=!!s[z];
+    cb.onchange=()=>{s[z]=cb.checked;LS.set('off',s);};
+    row.appendChild(cb);row.appendChild(document.createTextNode(z));r.appendChild(row);
+  });
+}
 renderOff();
 
 $('refreshBtn').onclick=()=>{loaded();weather();updateTimers();};
 loadSettings();
-</script></body>
+</script>
+
+</body>
 </html>
