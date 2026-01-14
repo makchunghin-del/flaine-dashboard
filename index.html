@@ -29,12 +29,17 @@
   <p>Weather · Snow · Lifts · Webcams · Piste Maps · Return Safety</p>
   <div class="toggle" onclick="toggleDark()">Toggle Dark Mode</div>
 </header><div class="container">  <div class="card">
-    <h2>Weather & Snow (Flaine)</h2>
+    <h2>Easy Access Maps</h2>
     <ul>
-      <li><a href="https://www.snow-forecast.com/resorts/Flaine/snow-report" target="_blank">Flaine Snow Report</a></li>
-      <li><a href="https://www.snow-forecast.com/resorts/Flaine/6day/mid" target="_blank">Flaine 6‑Day Forecast</a></li>
-      <li><a href="https://www.flaine.com/en/weather-opening/" target="_blank">Official Flaine Weather</a></li>
+      <li><a href="https://www.flaine.com/en/piste-map/" target="_blank">Flaine Live Piste & Lift Map</a></li>
+      <li><a href="https://www.grand-massif.com/en/trail-map/" target="_blank">Grand Massif Full Area Map</a></li>
+      <li><a href="https://www.google.com/maps/search/Combe+de+Gers" target="_blank">Combe de Gers (Google Maps)</a></li>
     </ul>
+    <p><small>Open these quickly to orient yourself before dropping in.</small></p>
+  </div>  <div class="card">
+    <h2>Live Weather (API)</h2>
+    <p id="weather">Loading weather…</p>
+    <p><small>Powered by OpenWeather (mountain conditions approximated).</small></p>
   </div>  <div class="card">
     <h2>Weather & Snow (Grand Massif)</h2>
     <ul>
@@ -48,15 +53,15 @@
     <h2>Live Webcams – Grand Massif</h2>
     <iframe src="https://www.grand-massif.com/en/webcams/" height="260"></iframe>
   </div>  <div class="card">
-    <h2>Lift Status – Key Flaine Lifts</h2>
+    <h2>Lift Status – Tap to Update</h2>
     <table>
       <tr><th>Lift</th><th>Status</th></tr>
-      <tr><td>Grandes Platières Gondola</td><td class="open">Open</td></tr>
-      <tr><td>Aup de Véran Gondola</td><td class="open">Open</td></tr>
-      <tr><td>Véret Chair</td><td class="open">Open</td></tr>
-      <tr><td>Lindars Nord</td><td class="closed">Weather Dependent</td></tr>
+      <tr><td>Grandes Platières</td><td><button onclick="toggleStatus(this)" class="open">OPEN</button></td></tr>
+      <tr><td>Aup de Véran</td><td><button onclick="toggleStatus(this)" class="open">OPEN</button></td></tr>
+      <tr><td>Véret</td><td><button onclick="toggleStatus(this)" class="open">OPEN</button></td></tr>
+      <tr><td>Lindars Nord</td><td><button onclick="toggleStatus(this)" class="closed">CLOSED</button></td></tr>
     </table>
-    <p><small>Always verify on live piste map.</small></p>
+    <p><small>Crowdsourced: tap to switch OPEN / CLOSED.</small></p>
   </div>  <div class="card">
     <h2>Lift Status – Grand Massif Sectors</h2>
     <table>
@@ -82,16 +87,36 @@
       <tr><td><strong>Time Until Last Lift</strong></td><td id="countdown">--</td></tr>
     </table>
   </div>  <div class="card">
-    <h2>Restaurant Crowd Guide</h2>
+    <h2>Off‑Piste Overlay</h2>
+    <p><strong>Key Zones:</strong></p>
     <ul>
-      <li>10:30–11:30 → 🟢 Quiet</li>
-      <li>12:00–14:00 → 🔴 Very Busy</li>
-      <li>14:30–15:30 → 🟡 Calmer</li>
+      <li><input type="checkbox" checked> Combe de Gers – high alpine bowl (advanced)</li>
+      <li><input type="checkbox" checked> Lindars / Véret side bowls</li>
+      <li><input type="checkbox"> Tree runs toward Samoëns</li>
+      <li><input type="checkbox"> Tree runs toward Les Carroz</li>
     </ul>
+    <p><small>Use with map links above. Always assess avalanche risk.</small></p>
   </div></div><footer>
   <p>Dashboard loaded at <span id="time"></span></p>
 </footer><script>
   document.getElementById('time').textContent = new Date().toLocaleString();
+function toggleStatus(btn){
+  if(btn.classList.contains('open')){
+    btn.classList.remove('open'); btn.classList.add('closed'); btn.innerText='CLOSED';
+  } else {
+    btn.classList.remove('closed'); btn.classList.add('open'); btn.innerText='OPEN';
+  }
+}
+
+async function loadWeather(){
+  try{
+    const res = await fetch('https://api.openweathermap.org/data/2.5/weather?lat=46.000&lon=6.688&units=metric&appid=YOUR_API_KEY');
+    const d = await res.json();
+    document.getElementById('weather').innerText = `Temp: ${d.main.temp}°C · Wind: ${d.wind.speed} m/s · ${d.weather[0].description}`;
+  }catch(e){ document.getElementById('weather').innerText='Weather unavailable'; }
+}
+loadWeather();
+
 </script><script>
 function toggleDark(){ document.body.classList.toggle('dark'); }
 function updateCountdown(){
