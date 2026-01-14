@@ -44,6 +44,8 @@ iframe{width:100%;border:1px solid var(--ring);border-radius:14px;background:#ff
 .pdfbar{display:flex;justify-content:space-between;gap:8px;padding:10px;background:rgba(12,59,102,.06)}
 .pdfbtn{border:1px solid var(--ring);border-radius:999px;padding:6px 10px;font-weight:900;background:transparent;cursor:pointer}
 canvas{width:100%;display:block;background:#fff}
+#pdfCanvas{touch-action:none;cursor:grab}
+#pdfCanvas:active{cursor:grabbing}
 
 .chk{display:flex;gap:10px;padding:10px;border:1px solid var(--ring);border-radius:14px}
 
@@ -191,5 +193,42 @@ $('zoomIn').onclick=()=>{fit=false;scale+=0.15;render();};
 $('zoomOut').onclick=()=>{fit=false;scale=Math.max(0.6,scale-0.15);render();};
 $('fit').onclick=()=>{fit=true;render();};
 setTimeout(loadPdf,300);
+
+// ===== PDF PAN + DOUBLE-TAP ZOOM (STEP 1) =====
+let isDragging=false,startX=0,startY=0,offsetX=0,offsetY=0,lastTap=0;
+const pdfEl=document.getElementById('pdfCanvas');
+
+function applyPan(){
+  pdfEl.style.transform=`translate(${offsetX}px, ${offsetY}px)`;
+}
+
+pdfEl.addEventListener('pointerdown',e=>{
+  isDragging=true;
+  startX=e.clientX-offsetX;
+  startY=e.clientY-offsetY;
+  pdfEl.setPointerCapture(e.pointerId);
+});
+
+pdfEl.addEventListener('pointermove',e=>{
+  if(!isDragging) return;
+  offsetX=e.clientX-startX;
+  offsetY=e.clientY-startY;
+  applyPan();
+});
+
+pdfEl.addEventListener('pointerup',e=>{
+  isDragging=false;
+  const now=Date.now();
+  if(now-lastTap<300){
+    // double tap → toggle zoom
+    fit=false;
+    scale = scale < 1.6 ? scale + 0.6 : 0.9;
+    offsetX=0; offsetY=0;
+    applyPan();
+    render();
+  }
+  lastTap=now;
+});
+
 </script></body>
 </html>
