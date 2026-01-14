@@ -1,508 +1,231 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Flaine & Grand Massif Snowboard Dashboard</title>
-  <style>
-    :root{
-      --bg:#eef2f7; --card:#ffffff; --text:#0b1220; --muted:#5b6575;
-      --brand:#0c3b66; --brand2:#0a2f52;
-      --ok:#0f7b3a; --bad:#c62828; --warn:#b26a00;
-      --ring: rgba(12,59,102,.18);
-      --shadow: 0 10px 22px rgba(0,0,0,.08);
-      --radius:16px;
-    }
-    body.dark{
-      --bg:#0b1220; --card:#0f172a; --text:#e8eefc; --muted:#a9b4c7;
-      --brand:#1b3d6b; --brand2:#0b223f;
-      --ring: rgba(148,163,184,.18);
-      --shadow: 0 10px 22px rgba(0,0,0,.35);
-    }
-    *{box-sizing:border-box}
-    body{margin:0; font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial; background:var(--bg); color:var(--text);}/* Top bar */
-.topbar{position:sticky; top:0; z-index:10; background:linear-gradient(90deg,var(--brand),var(--brand2)); color:#fff; padding:14px 16px; box-shadow:0 6px 18px rgba(0,0,0,.18)}
-.topbar-row{display:flex; gap:10px; align-items:center; justify-content:space-between; flex-wrap:wrap}
-.title{display:flex; flex-direction:column; gap:2px}
-.title h1{margin:0; font-size:1.1rem; line-height:1.2}
-.title .sub{font-size:.85rem; opacity:.92}
-.actions{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
-.btn{border:none; border-radius:999px; padding:10px 12px; background:rgba(255,255,255,.14); color:#fff; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:8px}
-.btn:active{transform:translateY(1px)}
-.btn.secondary{background:rgba(255,255,255,.10)}
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Flaine & Grand Massif – Embedded Piste Map</title>
 
-/* Layout */
-.wrap{padding:14px 14px 26px; max-width:1100px; margin:0 auto;}
-.grid{display:grid; grid-template-columns: repeat(12, 1fr); gap:12px;}
-.card{background:var(--card); border-radius:var(--radius); box-shadow:var(--shadow); border:1px solid var(--ring); overflow:hidden}
-.card-h{padding:12px 14px; display:flex; align-items:flex-start; justify-content:space-between; gap:10px}
-.card-h h2{margin:0; font-size:1.0rem;}
-.card-h .hint{color:var(--muted); font-size:.85rem; margin-top:3px}
-.card-b{padding:0 14px 14px}
+<style>
+  body {
+    margin: 0;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial;
+    background: #eef2f7;
+  }
 
-/* Quick stats tiles */
-.tiles{display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:10px; padding:12px 14px 14px}
-.tile{border-radius:14px; padding:12px; border:1px solid var(--ring); background:rgba(12,59,102,.06)}
-body.dark .tile{background:rgba(148,163,184,.07)}
-.tile .k{font-size:.82rem; color:var(--muted)}
-.tile .v{font-size:1.25rem; font-weight:900; margin-top:4px}
-.tile .s{font-size:.82rem; color:var(--muted); margin-top:4px}
+  header {
+    background: #0c3b66;
+    color: #fff;
+    padding: 14px 16px;
+  }
 
-/* Badges */
-.badge{display:inline-flex; align-items:center; gap:6px; border:1px solid var(--ring); border-radius:999px; padding:6px 10px; font-weight:800; font-size:.8rem;}
-.badge.ok{color:var(--ok)}
-.badge.warn{color:var(--warn)}
-.badge.bad{color:var(--bad)}
+  header h1 {
+    margin: 0;
+    font-size: 1.1rem;
+  }
 
-/* Links */
-a{color:var(--brand); font-weight:800; text-decoration:none}
-body.dark a{color:#93c5fd}
-.linkrow{display:flex; flex-wrap:wrap; gap:10px}
-.pill{display:inline-flex; align-items:center; gap:8px; padding:10px 12px; border-radius:999px; border:1px solid var(--ring); background:transparent; font-weight:800}
+  header p {
+    margin: 4px 0 0;
+    opacity: 0.9;
+    font-size: 0.85rem;
+  }
 
-/* Lift table */
-table{width:100%; border-collapse:collapse}
-th, td{padding:10px 6px; border-bottom:1px solid var(--ring); text-align:left; font-size:.95rem}
-th{color:var(--muted); font-size:.82rem; font-weight:900}
-.liftbtn{border:none; border-radius:999px; padding:9px 12px; font-weight:900; cursor:pointer; min-width:92px}
-.liftbtn.open{background:rgba(15,123,58,.12); color:var(--ok)}
-.liftbtn.closed{background:rgba(198,40,40,.12); color:var(--bad)}
-.liftbtn.unknown{background:rgba(178,106,0,.12); color:var(--warn)}
+  .container {
+    padding: 14px;
+    max-width: 1100px;
+    margin: auto;
+  }
 
-/* Off-piste */
-.checklist{display:grid; gap:10px; margin-top:8px}
-.chk{display:flex; gap:10px; align-items:flex-start; padding:10px; border-radius:14px; border:1px solid var(--ring)}
-.chk input{margin-top:3px; width:18px; height:18px}
-.chk .name{font-weight:900}
-.chk .desc{color:var(--muted); font-size:.9rem; margin-top:3px}
+  .card {
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 8px 20px rgba(0,0,0,.08);
+    overflow: hidden;
+  }
 
-/* Collapsible */
-details{border-top:1px solid var(--ring)}
-summary{list-style:none; cursor:pointer; padding:12px 14px; font-weight:900}
-summary::-webkit-details-marker{display:none}
-summary .sumrow{display:flex; align-items:center; justify-content:space-between; gap:10px}
-.chev{opacity:.7}
+  .toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 10px;
+    background: #f6f8fb;
+    align-items: center;
+    justify-content: space-between;
+  }
 
-/* Iframes */
-iframe{width:100%; border:none; border-radius:14px}
+  .toolbar .left,
+  .toolbar .right {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
 
-/* Responsive */
-.col-12{grid-column: span 12}
-.col-8{grid-column: span 8}
-.col-6{grid-column: span 6}
-.col-4{grid-column: span 4}
+  .btn {
+    border: none;
+    border-radius: 999px;
+    padding: 8px 12px;
+    font-weight: 700;
+    cursor: pointer;
+    background: #0c3b66;
+    color: #fff;
+  }
 
-@media (max-width: 860px){
-  .col-8,.col-6,.col-4{grid-column: span 12}
-  .tiles{grid-template-columns: repeat(2, minmax(0,1fr))}
-}
-  .pdfwrap{border:1px solid var(--ring); border-radius:14px; overflow:hidden; background:rgba(12,59,102,.06)}
-body.dark .pdfwrap{background:rgba(148,163,184,.07)}
-.pdfbar{display:flex; gap:8px; align-items:center; justify-content:space-between; padding:10px 12px; flex-wrap:wrap}
-.pdfbar .left, .pdfbar .right{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
-.pdfbtn{border:1px solid var(--ring); background:transparent; color:var(--text); font-weight:900; padding:8px 10px; border-radius:999px; cursor:pointer}
-.pdfbtn:active{transform:translateY(1px)}
-.pdfmeta{color:var(--muted); font-size:.85rem; font-weight:800}
-canvas#pdfCanvas{width:100%; height:auto; display:block; background:transparent}
+  .btn.secondary {
+    background: #dce4ee;
+    color: #0c3b66;
+  }
 
+  .status {
+    font-weight: 800;
+    font-size: 0.85rem;
+  }
+
+  canvas {
+    width: 100%;
+    display: block;
+    background: #fff;
+  }
+
+  footer {
+    text-align: center;
+    font-size: 0.85rem;
+    color: #666;
+    padding: 12px;
+  }
 </style>
 </head>
-<body>  <div class="topbar">
-    <div class="topbar-row">
-      <div class="title">
-        <h1>Flaine & Grand Massif Dashboard</h1>
-        <div class="sub">Quick-glance weather • lifts • maps • return timing</div>
+
+<body>
+
+<header>
+  <h1>Flaine & Grand Massif – Piste Map</h1>
+  <p>Embedded PDF map (Android-safe, no “Open” button)</p>
+</header>
+
+<div class="container">
+  <div class="card">
+
+    <div class="toolbar">
+      <div class="left">
+        <span class="status" id="status">Loading map…</span>
+        <span class="status">Page <span id="pageNum">1</span> / <span id="pageTotal">–</span></span>
       </div>
-      <div class="actions">
-        <button class="btn" id="darkBtn">🌙 Dark</button>
-        <button class="btn secondary" id="refreshBtn">🔄 Refresh</button>
-      </div>
-    </div>
-  </div>  <div class="wrap"><!-- QUICK GLANCE -->
-<div class="grid">
-  <div class="card col-12">
-    <div class="card-h">
-      <div>
-        <h2>Today at a glance</h2>
-        <div class="hint">Everything important in 5 seconds</div>
-      </div>
-      <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end">
-        <span class="badge" id="loadedAt">Loaded: --</span>
-        <span class="badge warn" id="returnBadge">Return: --</span>
-        <span class="badge" id="liftCountdownBadge">Last lift: --</span>
-      </div>
-    </div>
-    <div class="tiles">
-      <div class="tile">
-        <div class="k">Weather (Flaine)</div>
-        <div class="v" id="wxMain">--</div>
-        <div class="s" id="wxSub">Set API key to enable live weather</div>
-      </div>
-      <div class="tile">
-        <div class="k">Wind</div>
-        <div class="v" id="wxWind">--</div>
-        <div class="s" id="wxWindSub">Windy days = higher lift closure risk</div>
-      </div>
-      <div class="tile">
-        <div class="k">Time until last lift</div>
-        <div class="v" id="countdown">--</div>
-        <div class="s" id="lastLiftText">Default last lift: <strong>16:30</strong> (adjust in settings)</div>
-      </div>
-      <div class="tile">
-        <div class="k">Lunch crowd (guide)</div>
-        <div class="v">12:00–14:00</div>
-        <div class="s">Go early (10:30–11:30) or late (14:30–15:30)</div>
+      <div class="right">
+        <button class="btn secondary" id="prev">◀</button>
+        <button class="btn secondary" id="next">▶</button>
+        <button class="btn secondary" id="zoomOut">－</button>
+        <button class="btn secondary" id="zoomIn">＋</button>
+        <button class="btn secondary" id="fit">Fit</button>
+        <a class="btn" href="GM_PlanPistes_25_26_HD_copy.pdf" target="_blank">Open PDF</a>
       </div>
     </div>
 
-    <details open>
-      <summary>
-        <div class="sumrow">
-          <span>Fast links</span>
-          <span class="chev">⌄</span>
-        </div>
-      </summary>
-      <div class="card-b">
-        <div class="linkrow">
-          <a class="pill" href="https://www.flaine.com/en/piste-map/" target="_blank">🗺️ Flaine live piste/lifts</a>
-          <a class="pill" href="https://www.grand-massif.com/en/trail-map/" target="_blank">🗺️ Grand Massif map</a>
-          <a class="pill" href="https://www.grand-massif.com/en/the-weather-at-your-stations/" target="_blank">🌦️ Official GM weather</a>
-          <a class="pill" href="https://www.flaine.com/en/webcams/" target="_blank">🎥 Flaine webcams</a>
-          <a class="pill" href="https://www.grand-massif.com/en/webcams/" target="_blank">🎥 GM webcams</a>
-        </div>
-      </div>
-    </details>
+    <canvas id="pdfCanvas"></canvas>
+
   </div>
+</div>
 
-  <!-- MAP (PDF) + OFFICIAL LIVE STATUS -->
-  <div class="card col-12">
-    <div class="card-h">
-      <div>
-        <h2>Piste map (your PDF)</h2>
-        <div class="hint">Embedded map for quick reference (upload PDF next to index.html)</div>
-      </div>
-      <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end">
-        <a class="pill" href="GM_PlanPistes_25_26_HD_copy.pdf" target="_blank">🗺️ Open full map</a>
-        <a class="pill" href="https://www.grand-massif.com/en/trail-map/" target="_blank">🌐 Official map page</a>
-      </div>
-    </div>
-    <div class="card-b">
-      <div class="pdfwrap">
-        <div class="pdfbar">
-          <div class="left">
-            <span class="badge" id="pdfStatus">Loading map…</span>
-            <span class="pdfmeta" id="pdfMeta">Page <span id="pdfPage">1</span> / <span id="pdfTotal">--</span></span>
-          </div>
-          <div class="right">
-            <button class="pdfbtn" id="pdfPrev">◀ Prev</button>
-            <button class="pdfbtn" id="pdfNext">Next ▶</button>
-            <button class="pdfbtn" id="pdfZoomOut">－</button>
-            <button class="pdfbtn" id="pdfZoomIn">＋</button>
-            <button class="pdfbtn" id="pdfFit">Fit</button>
-            <a class="pill" href="GM_PlanPistes_25_26_HD_copy.pdf" target="_blank">📄 Open PDF</a>
-          </div>
-        </div>
-        <canvas id="pdfCanvas"></canvas>
-      </div>
-      <p style="margin:10px 0 0; color:var(--muted); font-size:.9rem">This embedded viewer uses PDF.js so Android doesn’t show the “Open” placeholder. If it still fails, use “Open PDF”.</p>
-    </div>
-  </div>
+<footer>
+  Tip: Add this page to your Android Home Screen for instant access
+</footer>
 
-  <footer style="text-align:center; padding:14px 10px; color:var(--muted)">
-    Tip: Add this page to Android Home Screen after hosting (GitHub Pages) for one-tap access.
-  </footer><script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.3.136/pdf.min.js"></script><script>
-  // ====== CONFIG ======
-  // Flaine approximate coords (center of resort). You can refine if you want.
-  const FLAINE = { lat: 46.001, lon: 6.688 };
-  const OPENWEATHER_KEY = "YOUR_API_KEY"; // <- replace to enable live weather
+<!-- PDF.js v5 (ES Module) -->
+<script type="module">
+  import * as pdfjsLib from './pdf.mjs';
 
-  // ====== UTIL ======
-  const $ = (id)=>document.getElementById(id);
-  const LS = {
-    get:(k,def)=>{ try{ const v = localStorage.getItem(k); return v? JSON.parse(v): def; }catch(e){ return def; } },
-    set:(k,v)=>{ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
-  };
+  pdfjsLib.GlobalWorkerOptions.workerSrc = './pdf.worker.mjs';
 
-  // ====== DARK MODE ======
-  function setDark(on){
-    document.body.classList.toggle('dark', on);
-    LS.set('dark', on);
-    $('darkBtn').textContent = on ? '☀️ Light' : '🌙 Dark';
-  }
-  $('darkBtn').addEventListener('click', ()=> setDark(!document.body.classList.contains('dark')));
-  setDark(LS.get('dark', false));
-
-  // ====== LOADED TIME ======
-  function setLoadedBadge(){
-    const t = new Date();
-    $('loadedAt').textContent = 'Loaded: ' + t.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-  }
-  setLoadedBadge();
-
-  // ====== SETTINGS ======
-  const settings = LS.get('settings', { lastLift:'16:30', returnWarn:'15:30' });
-  $('lastLift').value = settings.lastLift;
-  $('returnWarn').value = settings.returnWarn;
-
-  function saveSettings(){
-    const s = { lastLift: $('lastLift').value || '16:30', returnWarn: $('returnWarn').value || '15:30' };
-    LS.set('settings', s);
-    updateCountdown();
-    updateReturnBadge();
-  }
-  $('saveSettings').addEventListener('click', saveSettings);
-
-  $('resetLocal').addEventListener('click', ()=>{
-    localStorage.removeItem('liftStatuses');
-    localStorage.removeItem('offpiste');
-    renderLiftTable();
-    renderOffpiste();
-
-  // ====== EMBEDDED PDF MAP (PDF.js) ======
   const PDF_URL = 'GM_PlanPistes_25_26_HD_copy.pdf';
+
+  const canvas = document.getElementById('pdfCanvas');
+  const ctx = canvas.getContext('2d');
+
+  const statusEl = document.getElementById('status');
+  const pageNumEl = document.getElementById('pageNum');
+  const pageTotalEl = document.getElementById('pageTotal');
+
   let pdfDoc = null;
-  let pdfPageNum = 1;
-  let pdfScale = 1.2;
-  let pdfFitMode = true;
+  let pageNum = 1;
+  let scale = 1.2;
+  let fitMode = true;
 
-  function setPdfStatus(text, type){
-    const el = $('pdfStatus');
-    if(!el) return;
-    el.textContent = text;
-    el.className = 'badge' + (type ? (' ' + type) : '');
+  function setStatus(text) {
+    statusEl.textContent = text;
   }
 
-  async function loadPdf(){
-    const canvas = $('pdfCanvas');
-    if(!canvas) return;
-
-    try{
-      // Worker setup
-      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.3.136/pdf.worker.min.js';
-
-      setPdfStatus('Loading map…', 'warn');
-      pdfDoc = await pdfjsLib.getDocument({ url: PDF_URL }).promise;
-      $('pdfTotal').textContent = pdfDoc.numPages;
-      pdfPageNum = Math.min(pdfPageNum, pdfDoc.numPages);
-      await renderPdfPage();
-      setPdfStatus('Map ready', 'ok');
-    } catch (e){
-      setPdfStatus('Map failed (use Open PDF)', 'bad');
-      console.error(e);
-    }
-  }
-
-  function calcFitScale(viewport, canvas){
-    const containerWidth = canvas.parentElement.clientWidth;
-    // leave a little padding
-    return (containerWidth / viewport.width) * 0.98;
-  }
-
-  async function renderPdfPage(){
-    if(!pdfDoc) return;
-    const canvas = $('pdfCanvas');
-    const ctx = canvas.getContext('2d');
-    $('pdfPage').textContent = pdfPageNum;
-
-    const page = await pdfDoc.getPage(pdfPageNum);
+  async function renderPage() {
+    const page = await pdfDoc.getPage(pageNum);
     const baseViewport = page.getViewport({ scale: 1 });
 
-    // Fit-to-width by default
-    if(pdfFitMode){
-      pdfScale = calcFitScale(baseViewport, canvas);
+    if (fitMode) {
+      const containerWidth = canvas.parentElement.clientWidth;
+      scale = (containerWidth / baseViewport.width) * 0.98;
     }
 
-    const viewport = page.getViewport({ scale: pdfScale });
-
-    // HiDPI support
+    const viewport = page.getViewport({ scale });
     const dpr = window.devicePixelRatio || 1;
-    canvas.width = Math.floor(viewport.width * dpr);
-    canvas.height = Math.floor(viewport.height * dpr);
+
+    canvas.width = viewport.width * dpr;
+    canvas.height = viewport.height * dpr;
     canvas.style.width = viewport.width + 'px';
     canvas.style.height = viewport.height + 'px';
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     await page.render({ canvasContext: ctx, viewport }).promise;
 
-    $('pdfMeta').innerHTML = `Page <span id="pdfPage">${pdfPageNum}</span> / <span id="pdfTotal">${pdfDoc.numPages}</span>`;
+    pageNumEl.textContent = pageNum;
+    pageTotalEl.textContent = pdfDoc.numPages;
   }
 
-  function clampPage(){
-    if(!pdfDoc) return;
-    pdfPageNum = Math.max(1, Math.min(pdfPageNum, pdfDoc.numPages));
+  async function loadPdf() {
+    try {
+      setStatus('Loading map…');
+      pdfDoc = await pdfjsLib.getDocument(PDF_URL).promise;
+      setStatus('Map ready');
+      await renderPage();
+    } catch (e) {
+      console.error(e);
+      setStatus('Failed to load map');
+    }
   }
 
-  function hookPdfControls(){
-    const prev = $('pdfPrev');
-    const next = $('pdfNext');
-    const zin  = $('pdfZoomIn');
-    const zout = $('pdfZoomOut');
-    const fit  = $('pdfFit');
+  document.getElementById('prev').onclick = async () => {
+    if (pageNum > 1) {
+      pageNum--;
+      await renderPage();
+    }
+  };
 
-    if(prev) prev.addEventListener('click', async ()=>{
-      if(!pdfDoc) return;
-      pdfPageNum--; clampPage();
-      await renderPdfPage();
-    });
-    if(next) next.addEventListener('click', async ()=>{
-      if(!pdfDoc) return;
-      pdfPageNum++; clampPage();
-      await renderPdfPage();
-    });
-    if(zin) zin.addEventListener('click', async ()=>{
-      if(!pdfDoc) return;
-      pdfFitMode = false;
-      pdfScale = Math.min(pdfScale + 0.15, 3.0);
-      await renderPdfPage();
-    });
-    if(zout) zout.addEventListener('click', async ()=>{
-      if(!pdfDoc) return;
-      pdfFitMode = false;
-      pdfScale = Math.max(pdfScale - 0.15, 0.6);
-      await renderPdfPage();
-    });
-    if(fit) fit.addEventListener('click', async ()=>{
-      if(!pdfDoc) return;
-      pdfFitMode = true;
-      await renderPdfPage();
-    });
+  document.getElementById('next').onclick = async () => {
+    if (pageNum < pdfDoc.numPages) {
+      pageNum++;
+      await renderPage();
+    }
+  };
 
-    // Re-fit on rotate / resize
-    window.addEventListener('resize', ()=>{
-      if(!pdfDoc) return;
-      if(pdfFitMode){
-        renderPdfPage();
-      }
-    });
-  }
+  document.getElementById('zoomIn').onclick = async () => {
+    fitMode = false;
+    scale = Math.min(scale + 0.15, 3);
+    await renderPage();
+  };
 
-  hookPdfControls();
+  document.getElementById('zoomOut').onclick = async () => {
+    fitMode = false;
+    scale = Math.max(scale - 0.15, 0.6);
+    await renderPage();
+  };
+
+  document.getElementById('fit').onclick = async () => {
+    fitMode = true;
+    await renderPage();
+  };
+
+  window.addEventListener('resize', () => {
+    if (fitMode && pdfDoc) renderPage();
+  });
+
   loadPdf();
-  });
+</script>
 
-  // ====== COUNTDOWN ======
-  function updateCountdown(){
-    const s = LS.get('settings', { lastLift:'16:30', returnWarn:'15:30' });
-    const [h,m] = (s.lastLift||'16:30').split(':').map(Number);
-    const now = new Date();
-    const last = new Date();
-    last.setHours(h, m, 0, 0);
-
-    const diff = last - now;
-    if(diff <= 0){
-      $('countdown').textContent = 'Closed';
-      $('liftCountdownBadge').textContent = 'Last lift: closed';
-      return;
-    }
-    const mins = Math.floor(diff/60000);
-    const hrs = Math.floor(mins/60);
-    $('countdown').textContent = `${hrs}h ${mins%60}m`;
-    $('liftCountdownBadge').textContent = `Last lift: ${s.lastLift} (${hrs}h ${mins%60}m)`;
-  }
-  setInterval(updateCountdown, 30000);
-  updateCountdown();
-
-  function updateReturnBadge(){
-    const s = LS.get('settings', { lastLift:'16:30', returnWarn:'15:30' });
-    const [h,m] = (s.returnWarn||'15:30').split(':').map(Number);
-    const now = new Date();
-    const warn = new Date();
-    warn.setHours(h,m,0,0);
-    const diff = warn - now;
-
-    if(diff <= 0){
-      $('returnBadge').className = 'badge bad';
-      $('returnBadge').textContent = `Return: NOW (past ${s.returnWarn})`;
-      return;
-    }
-    const mins = Math.floor(diff/60000);
-    const hrs = Math.floor(mins/60);
-    $('returnBadge').className = mins <= 60 ? 'badge warn' : 'badge';
-    $('returnBadge').textContent = `Return: ${s.returnWarn} (in ${hrs}h ${mins%60}m)`;
-  }
-  setInterval(updateReturnBadge, 30000);
-  updateReturnBadge();
-
-  // ====== REFRESH BUTTON ======
-  $('refreshBtn').addEventListener('click', ()=>{
-    setLoadedBadge();
-    loadWeather();
-    updateCountdown();
-    updateReturnBadge();
-  });
-
-  // ====== WEATHER (OpenWeather) ======
-  async function loadWeather(){
-    const keyOk = OPENWEATHER_KEY && OPENWEATHER_KEY !== 'YOUR_API_KEY';
-    if(!keyOk){
-      $('wxStatus').textContent = 'API key needed';
-      $('wxStatus').className = 'badge warn';
-      $('wxMain').textContent = '--';
-      $('wxSub').textContent = 'Add your OpenWeather key to enable live weather';
-      $('wxWind').textContent = '--';
-      return;
-    }
-
-    try{
-      $('wxStatus').textContent = 'Loading…';
-      $('wxStatus').className = 'badge';
-      const url = `https://api.openweathermap.org/data/2.5/weather?lat=${FLAINE.lat}&lon=${FLAINE.lon}&units=metric&appid=${OPENWEATHER_KEY}`;
-      const res = await fetch(url, { cache: 'no-store' });
-      const d = await res.json();
-
-      if(!d || !d.main){ throw new Error('Bad response'); }
-
-      const temp = Math.round(d.main.temp);
-      const feels = Math.round(d.main.feels_like);
-      const desc = (d.weather && d.weather[0] && d.weather[0].description) ? d.weather[0].description : '—';
-      const wind = (d.wind && typeof d.wind.speed === 'number') ? d.wind.speed : null;
-
-      $('wxMain').textContent = `${temp}°C`;
-      $('wxSub').textContent = `${desc} · feels like ${feels}°C`;
-      $('wxWind').textContent = wind !== null ? `${wind.toFixed(1)} m/s` : '--';
-
-      // simple status interpretation
-      if(wind !== null && wind >= 10){
-        $('wxStatus').textContent = 'Windy (closure risk)';
-        $('wxStatus').className = 'badge warn';
-      } else {
-        $('wxStatus').textContent = 'Live';
-        $('wxStatus').className = 'badge ok';
-      }
-    }catch(e){
-      $('wxStatus').textContent = 'Unavailable';
-      $('wxStatus').className = 'badge bad';
-      $('wxSub').textContent = 'Could not load weather. Use Snow Forecast link as backup.';
-    }
-  }
-  loadWeather();
-
-  // ====== LIFTS (tap + local save) ======
-  const liftDefaults = [
-    { key:'grand_platieres', name:'Grandes Platières', note:'High altitude access (wind sensitive)', status:'unknown' },
-    { key:'aup_de_veran', name:'Aup de Véran', note:'Core sector lift', status:'unknown' },
-    { key:'veret', name:'Véret', note:'Good access to upper terrain', status:'unknown' },
-    { key:'lindars_nord', name:'Lindars Nord', note:'Often affected by wind/visibility', status:'unknown' },
-  ];
-
-  function nextStatus(cur){
-    if(cur === 'unknown') return 'open';
-    if(cur === 'open') return 'closed';
-    return 'unknown';
-  }
-
-  function statusLabel(s){
-    if(s==='open') return {text:'OPEN', cls:'open'};
-    if(s==='closed') return {text:'CLOSED', cls:'closed'};
-    return {text:'UNKNOWN', cls:'unknown'};
-  }
-
-  function renderLiftTable(){
-    const saved = LS.get('liftStatuses', {});
-    const rows = liftDefaults.map(l => ({...l, status: saved[l.key] || l.status }));
-    const tbody = $('liftTable');
-    tbody.innerHTML = '';
-
-    rows.forEach(l => {
-      const tr = document.createElement('tr');
-      const td1 = document.createElement('td');
-      td1.innerH
+</body>
+</html>
