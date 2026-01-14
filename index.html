@@ -9,7 +9,7 @@
 :root{
   --bg:#eef2f7; --card:#ffffff; --text:#0b1220; --muted:#5b6575;
   --brand:#0c3b66; --brand2:#0a2f52;
-  --ok:#0f7b3a; --bad:#c62828; --warn:#b26a00;
+  --ok:#0f7b3a; --warn:#b26a00;
   --ring: rgba(12,59,102,.18);
   --shadow: 0 10px 22px rgba(0,0,0,.08);
 }
@@ -21,11 +21,13 @@ body.dark{
 *{box-sizing:border-box}
 body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;background:var(--bg);color:var(--text)}
 
-.topbar{position:sticky;top:0;z-index:10;background:linear-gradient(90deg,var(--brand),var(--brand2));color:#fff;padding:14px 16px}
+.topbar{
+  position:sticky;top:0;z-index:10;
+  background:linear-gradient(90deg,var(--brand),var(--brand2));
+  color:#fff;padding:14px 16px
+}
 .topbar-row{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
-
 .btn{border:none;border-radius:999px;padding:10px 12px;background:rgba(255,255,255,.14);color:#fff;font-weight:800;cursor:pointer}
-.btn.secondary{background:rgba(255,255,255,.1)}
 
 .wrap{padding:14px;max-width:1200px;margin:auto}
 .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:12px}
@@ -43,11 +45,8 @@ body.dark .tile{background:rgba(148,163,184,.07)}
 .tile .k{font-size:.8rem;color:var(--muted)}
 .tile .v{font-size:1.25rem;font-weight:900}
 
-.settings label{font-weight:900;font-size:.85rem;display:block;margin-bottom:6px}
-.settings input{padding:8px 10px;border-radius:10px;border:1px solid var(--ring);font-weight:800;margin-right:6px}
-
 a.pill{
-  display:inline-flex;align-items:center;gap:8px;
+  display:inline-flex;gap:8px;align-items:center;
   padding:10px 14px;border-radius:999px;
   border:1px solid var(--ring);
   font-weight:900;text-decoration:none;color:var(--text)
@@ -57,7 +56,6 @@ iframe{width:100%;border:1px solid var(--ring);border-radius:14px;background:#ff
 
 .pdfwrap{border:1px solid var(--ring);border-radius:14px;overflow:hidden}
 .pdfbar{display:flex;justify-content:space-between;gap:8px;padding:10px;background:rgba(12,59,102,.06)}
-body.dark .pdfbar{background:rgba(148,163,184,.07)}
 .pdfbtn{border:1px solid var(--ring);border-radius:999px;padding:6px 10px;font-weight:900;background:transparent;cursor:pointer}
 canvas{width:100%;display:block;background:#fff}
 
@@ -72,87 +70,61 @@ canvas{width:100%;display:block;background:#fff}
   <div class="topbar-row">
     <div>
       <strong>Flaine & Grand Massif</strong><br>
-      <span style="font-size:.85rem;opacity:.9">Weather • Lifts • Maps • Return timing</span>
+      <span style="font-size:.85rem;opacity:.9">Live weather • Lifts • Maps</span>
     </div>
-    <div>
-      <button class="btn" id="darkBtn">🌙 Dark</button>
-      <button class="btn secondary" id="refreshBtn">🔄 Refresh</button>
-    </div>
+    <button class="btn" id="darkBtn">🌙 Dark</button>
   </div>
 </div>
 
 <div class="wrap">
 <div class="grid">
 
-<!-- AT A GLANCE -->
+<!-- WEATHER -->
 <div class="card col-12">
   <div class="card-h">
-    <strong>Today at a glance</strong>
-    <div>
-      <span class="badge" id="loadedAt">--</span>
-      <span class="badge warn" id="returnBadge">--</span>
-      <span class="badge" id="liftCountdownBadge">--</span>
-    </div>
+    <strong>Live Weather (Flaine)</strong>
+    <span class="badge ok" id="wxStatus">Live</span>
   </div>
   <div class="card-b tiles">
-    <div class="tile"><div class="k">Weather</div><div class="v" id="wxMain">--</div></div>
-    <div class="tile"><div class="k">Wind</div><div class="v" id="wxWind">--</div></div>
-    <div class="tile"><div class="k">Last lift in</div><div class="v" id="countdown">--</div></div>
-    <div class="tile"><div class="k">Lunch crowd</div><div class="v">12–14</div></div>
+    <div class="tile">
+      <div class="k">Temperature</div>
+      <div class="v" id="wxTemp">--</div>
+    </div>
+    <div class="tile">
+      <div class="k">Wind</div>
+      <div class="v" id="wxWind">--</div>
+    </div>
+    <div class="tile">
+      <div class="k">Wind Gust</div>
+      <div class="v" id="wxGust">--</div>
+    </div>
+    <div class="tile">
+      <div class="k">Snow (next hours)</div>
+      <div class="v" id="wxSnow">--</div>
+    </div>
   </div>
 </div>
 
-<!-- SETTINGS -->
-<div class="card col-12">
-  <div class="card-h"><strong>Settings</strong></div>
-  <div class="card-b settings">
-    <label>Last lift time <input type="time" id="lastLift"></label>
-    <label>Return warning <input type="time" id="returnWarn"></label>
-    <button class="btn secondary" id="saveSettings">Save</button>
-    <button class="btn secondary" id="resetSettings">Reset</button>
-  </div>
-</div>
-
-<!-- OFFICIAL STATUS (EMBED + FALLBACK) -->
+<!-- OFFICIAL STATUS -->
 <div class="card col-12">
   <div class="card-h">
     <strong>Official Lift & Piste Status</strong>
     <span class="badge ok">Live (official)</span>
   </div>
   <div class="card-b">
-
     <strong>Flaine – Opening Status</strong>
-    <iframe
-      src="https://www.flaine.com/en/weather-opening/"
-      loading="lazy"
-      referrerpolicy="no-referrer"
-      style="height:520px">
-    </iframe>
+    <iframe src="https://www.flaine.com/en/weather-opening/" loading="lazy" style="height:520px"></iframe>
 
     <div style="height:14px"></div>
 
     <strong>Grand Massif – Lift & Piste Map</strong>
-    <iframe
-      id="gmFrame"
-      src="https://www.grand-massif.com/en/trail-map/"
-      loading="lazy"
-      referrerpolicy="no-referrer"
-      style="height:520px">
-    </iframe>
-
-    <div id="gmFallback" style="display:none;margin-top:10px">
-      <a class="pill" target="_blank"
-         href="https://www.grand-massif.com/en/trail-map/">
-        Open Grand Massif official map
-      </a>
-    </div>
-
+    <iframe src="https://www.grand-massif.com/en/trail-map/" loading="lazy" style="height:520px"></iframe>
   </div>
 </div>
 
 <!-- PDF MAP -->
 <div class="card col-12">
-  <div class="card-h"><strong>Piste map (PDF)</strong></div>
+  <div class="card-h"><strong>Piste Map (PDF)</strong></div>
   <div class="card-b">
     <div class="pdfwrap">
       <div class="pdfbar">
@@ -171,12 +143,6 @@ canvas{width:100%;display:block;background:#fff}
   </div>
 </div>
 
-<!-- OFF-PISTE -->
-<div class="card col-12">
-  <div class="card-h"><strong>Off-piste planning</strong></div>
-  <div class="card-b" id="offpisteList"></div>
-</div>
-
 </div>
 </div>
 
@@ -186,68 +152,37 @@ pdfjsLib.GlobalWorkerOptions.workerSrc =
   new URL('./pdf.worker.mjs', import.meta.url).toString();
 
 const $ = id => document.getElementById(id);
-const LS = {get:(k,d)=>JSON.parse(localStorage.getItem(k)||JSON.stringify(d)),set:(k,v)=>localStorage.setItem(k,JSON.stringify(v))};
 
+// Dark mode
 $('darkBtn').onclick=()=>document.body.classList.toggle('dark');
 
-function loaded(){ $('loadedAt').textContent='Loaded '+new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}); }
-loaded();
-
-// SETTINGS
-const DEFAULTS={lastLift:'16:30',returnWarn:'15:30'};
-function loadSettings(){
-  const s=LS.get('settings',DEFAULTS);
-  $('lastLift').value=s.lastLift;
-  $('returnWarn').value=s.returnWarn;
-  updateTimers();
-}
-$('saveSettings').onclick=()=>{LS.set('settings',{lastLift:$('lastLift').value,returnWarn:$('returnWarn').value});updateTimers();};
-$('resetSettings').onclick=()=>{LS.set('settings',DEFAULTS);loadSettings();};
-
-function updateTimers(){
-  const s=LS.get('settings',DEFAULTS), now=new Date();
-  let [h,m]=s.lastLift.split(':').map(Number);
-  let t=new Date(); t.setHours(h,m,0,0);
-  let d=t-now;
-  $('countdown').textContent=d<=0?'Closed':Math.floor(d/60000/60)+'h '+Math.floor(d/60000)%60+'m';
-  $('liftCountdownBadge').textContent='Last lift '+s.lastLift;
-
-  [h,m]=s.returnWarn.split(':').map(Number);
-  t=new Date(); t.setHours(h,m,0,0);
-  $('returnBadge').textContent=t-now<=0?'RETURN NOW':'Return '+s.returnWarn;
-}
-setInterval(updateTimers,30000);
-
-// Weather (optional)
-const KEY='YOUR_API_KEY', FLAINE={lat:46.001,lon:6.688};
-async function weather(){
-  if(KEY==='YOUR_API_KEY') return;
-  const r=await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${FLAINE.lat}&lon=${FLAINE.lon}&units=metric&appid=${KEY}`);
-  const d=await r.json();
-  $('wxMain').textContent=Math.round(d.main.temp)+'°C';
-  $('wxWind').textContent=d.wind.speed.toFixed(1)+' m/s';
-}
-weather();
-
-// GM iframe fallback detection
-setTimeout(()=>{
-  const f=document.getElementById('gmFrame');
+// WEATHER — Open-Meteo (NO API KEY)
+const LAT = 46.001, LON = 6.688;
+async function loadWeather(){
   try{
-    if(!f.contentDocument || f.contentDocument.body.innerHTML.length<100){
-      f.style.display='none';
-      document.getElementById('gmFallback').style.display='block';
-    }
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current=temperature_2m,wind_speed_10m,wind_gusts_10m&hourly=snowfall&timezone=auto`;
+    const r = await fetch(url);
+    const d = await r.json();
+
+    $('wxTemp').textContent = Math.round(d.current.temperature_2m) + '°C';
+    $('wxWind').textContent = d.current.wind_speed_10m.toFixed(1) + ' m/s';
+    $('wxGust').textContent = d.current.wind_gusts_10m.toFixed(1) + ' m/s';
+
+    const snowNext = d.hourly.snowfall.slice(0,6).reduce((a,b)=>a+b,0);
+    $('wxSnow').textContent = snowNext > 0 ? snowNext.toFixed(1)+' mm' : 'None';
   }catch(e){
-    f.style.display='none';
-    document.getElementById('gmFallback').style.display='block';
+    $('wxStatus').textContent = 'Unavailable';
+    $('wxStatus').className = 'badge warn';
   }
-},3000);
+}
+loadWeather();
 
 // PDF
 const PDF='GM_PlanPistes_25_26_HD_copy.pdf';
 let pdf,page=1,scale=0.9,fit=true;
 const DPR=Math.min(devicePixelRatio||1,1.5);
 const canvas=$('pdfCanvas'),ctx=canvas.getContext('2d');
+
 async function render(){
   const p=await pdf.getPage(page);
   const base=p.getViewport({scale:1});
@@ -266,23 +201,6 @@ $('zoomIn').onclick=()=>{fit=false;scale+=0.15;render();};
 $('zoomOut').onclick=()=>{fit=false;scale=Math.max(0.6,scale-0.15);render();};
 $('fit').onclick=()=>{fit=true;render();};
 setTimeout(loadPdf,300);
-
-// Off-piste
-const zones=['Combe de Gers','Trees toward Samoëns','Trees toward Carroz'];
-function renderOff(){
-  const s=LS.get('off',{}),r=$('offpisteList');r.innerHTML='';
-  zones.forEach(z=>{
-    const row=document.createElement('div');
-    const cb=document.createElement('input');cb.type='checkbox';cb.checked=!!s[z];
-    cb.onchange=()=>{s[z]=cb.checked;LS.set('off',s);};
-    row.appendChild(cb);row.appendChild(document.createTextNode(' '+z));
-    r.appendChild(row);
-  });
-}
-renderOff();
-
-$('refreshBtn').onclick=()=>{loaded();weather();updateTimers();};
-loadSettings();
 </script>
 
 </body>
