@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Flaine & Grand Massif – Embedded Piste Map</title>
+<title>Flaine & Grand Massif – Piste Map</title>
 
 <style>
   body {
@@ -80,6 +80,12 @@
     font-size: 0.85rem;
   }
 
+  #loadingHint {
+    padding: 14px;
+    font-weight: 700;
+    color: #555;
+  }
+
   canvas {
     width: 100%;
     display: block;
@@ -99,7 +105,7 @@
 
 <header>
   <h1>Flaine & Grand Massif – Piste Map</h1>
-  <p>Embedded PDF map (Android-safe, no “Open” button)</p>
+  <p>Embedded map • Android-safe • No “Open PDF” button</p>
 </header>
 
 <div class="container">
@@ -107,7 +113,7 @@
 
     <div class="toolbar">
       <div class="left">
-        <span class="status" id="status">Loading map…</span>
+        <span class="status" id="status">Preparing…</span>
         <span class="status">Page <span id="pageNum">1</span> / <span id="pageTotal">–</span></span>
       </div>
       <div class="right">
@@ -120,20 +126,23 @@
       </div>
     </div>
 
+    <div id="loadingHint">Loading piste map…</div>
     <canvas id="pdfCanvas"></canvas>
 
   </div>
 </div>
 
 <footer>
-  Tip: Add this page to your Android Home Screen for instant access
+  Tip: Add this page to your phone’s Home Screen for one-tap ski access
 </footer>
 
-<!-- PDF.js v5 (ES Module) -->
+<!-- PDF.js v5 (ES Module, GitHub Pages SAFE) -->
 <script type="module">
   import * as pdfjsLib from './pdf.mjs';
 
-  pdfjsLib.GlobalWorkerOptions.workerSrc = './pdf.worker.mjs';
+  // ✅ REQUIRED for PDF.js v5 on GitHub Pages
+  pdfjsLib.GlobalWorkerOptions.workerSrc =
+    new URL('./pdf.worker.mjs', import.meta.url).toString();
 
   const PDF_URL = 'GM_PlanPistes_25_26_HD_copy.pdf';
 
@@ -143,11 +152,15 @@
   const statusEl = document.getElementById('status');
   const pageNumEl = document.getElementById('pageNum');
   const pageTotalEl = document.getElementById('pageTotal');
+  const loadingHint = document.getElementById('loadingHint');
 
   let pdfDoc = null;
   let pageNum = 1;
-  let scale = 1.2;
+
+  // 🔥 Performance-tuned defaults
+  let scale = 0.9;              // faster first paint
   let fitMode = true;
+  const DPR = Math.min(window.devicePixelRatio || 1, 1.5);
 
   function setStatus(text) {
     statusEl.textContent = text;
@@ -163,18 +176,19 @@
     }
 
     const viewport = page.getViewport({ scale });
-    const dpr = window.devicePixelRatio || 1;
 
-    canvas.width = viewport.width * dpr;
-    canvas.height = viewport.height * dpr;
+    canvas.width = viewport.width * DPR;
+    canvas.height = viewport.height * DPR;
     canvas.style.width = viewport.width + 'px';
     canvas.style.height = viewport.height + 'px';
 
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+
     await page.render({ canvasContext: ctx, viewport }).promise;
 
     pageNumEl.textContent = pageNum;
     pageTotalEl.textContent = pdfDoc.numPages;
+    loadingHint.remove();
   }
 
   async function loadPdf() {
@@ -186,21 +200,17 @@
     } catch (e) {
       console.error(e);
       setStatus('Failed to load map');
+      loadingHint.textContent = 'Failed to load map. Use Open PDF.';
     }
   }
 
+  // Controls
   document.getElementById('prev').onclick = async () => {
-    if (pageNum > 1) {
-      pageNum--;
-      await renderPage();
-    }
+    if (pageNum > 1) { pageNum--; await renderPage(); }
   };
 
   document.getElementById('next').onclick = async () => {
-    if (pageNum < pdfDoc.numPages) {
-      pageNum++;
-      await renderPage();
-    }
+    if (pageNum < pdfDoc.numPages) { pageNum++; await renderPage(); }
   };
 
   document.getElementById('zoomIn').onclick = async () => {
@@ -224,7 +234,8 @@
     if (fitMode && pdfDoc) renderPage();
   });
 
-  loadPdf();
+  // ⏳ Delay start slightly so UI paints first (perceived speed)
+  setTimeout(loadPdf, 300);
 </script>
 
 </body>
