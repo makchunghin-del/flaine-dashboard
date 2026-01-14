@@ -1,11 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Flaine & Grand Massif Snowboard Dashboard</title>
-
-<style>
+<title>Flaine & Grand Massif Snowboard Dashboard</title><style>
 :root{
   --bg:#eef2f7; --card:#ffffff; --text:#0b1220; --muted:#5b6575;
   --brand:#0c3b66; --brand2:#0a2f52;
@@ -50,35 +47,18 @@ canvas{width:100%;display:block;background:#fff}
 
 .chk{display:flex;gap:10px;padding:10px;border:1px solid var(--ring);border-radius:14px}
 
-a.pill{
-  display:inline-flex;align-items:center;gap:8px;
-  padding:10px 14px;border-radius:999px;
-  border:1px solid var(--ring);
-  font-weight:900;text-decoration:none;color:var(--text)
-}
-
 .col-12{grid-column:span 12}
 @media(max-width:860px){.tiles{grid-template-columns:1fr}}
-</style>
-</head>
-
-<body>
-
-<div class="topbar">
+</style></head><body><div class="topbar">
   <div class="topbar-row">
     <div>
       <strong>Flaine & Grand Massif</strong><br>
-      <span style="font-size:.85rem;opacity:.9">Live weather • Lifts • Maps • Off-piste</span>
+      <span style="font-size:.85rem;opacity:.9">Weather • Maps • Off-piste • Lift status</span>
     </div>
     <button class="btn" id="darkBtn">🌙 Dark</button>
   </div>
-</div>
-
-<div class="wrap">
-<div class="grid">
-
-<!-- WEATHER -->
-<div class="card col-12">
+</div><div class="wrap">
+<div class="grid"><!-- WEATHER --><div class="card col-12">
   <div class="card-h">
     <strong>Live Weather (Flaine)</strong>
     <span class="badge ok" id="wxStatus">Live</span>
@@ -89,44 +69,7 @@ a.pill{
     <div class="tile"><div class="k">Wind Gust</div><div class="v" id="wxGust">--</div></div>
     <div class="tile"><div class="k">Snow (next hours)</div><div class="v" id="wxSnow">--</div></div>
   </div>
-</div>
-
-<!-- OFFICIAL STATUS (OPTION 1) -->
-<div class="card col-12">
-  <div class="card-h">
-    <strong>Official Lift & Piste Status</strong>
-    <span class="badge ok">Live</span>
-  </div>
-  <div class="card-b">
-
-    <strong>Flaine – Opening Status</strong>
-    <iframe src="https://www.flaine.com/en/weather-opening/" loading="lazy" style="height:520px"></iframe>
-
-    <div style="height:14px"></div>
-
-    <strong>Grand Massif – Lift & Piste Map</strong>
-    <iframe id="gmFrame"
-      src="https://www.grand-massif.com/en/trail-map/"
-      loading="lazy"
-      style="height:520px"></iframe>
-
-    <div id="gmFallback" style="display:none;margin-top:10px">
-      <a class="pill" target="_blank" href="https://www.grand-massif.com/en/trail-map/">
-        Open Grand Massif official map
-      </a>
-    </div>
-
-  </div>
-</div>
-
-<!-- OFF-PISTE SUGGESTIONS -->
-<div class="card col-12">
-  <div class="card-h"><strong>Off-piste (community-known zones)</strong></div>
-  <div class="card-b" id="offpisteList"></div>
-</div>
-
-<!-- PDF MAP -->
-<div class="card col-12">
+</div><!-- PISTE MAP (PDF) --><div class="card col-12">
   <div class="card-h"><strong>Piste Map (PDF)</strong></div>
   <div class="card-b">
     <div class="pdfwrap">
@@ -144,22 +87,41 @@ a.pill{
       <canvas id="pdfCanvas"></canvas>
     </div>
   </div>
+</div><!-- OFF-PISTE --><div class="card col-12">
+  <div class="card-h"><strong>Off-piste (community-known zones)</strong></div>
+  <div class="card-b" id="offpisteList"></div>
+</div><!-- OFFICIAL LIFT STATUS (LAST) --><div class="card col-12">
+  <div class="card-h">
+    <strong>Official Lift & Piste Status</strong>
+    <span class="badge ok">Live</span>
+  </div>
+  <div class="card-b"><strong>Flaine – Opening Status</strong>
+<iframe src="https://www.flaine.com/en/weather-opening/" loading="lazy" style="height:520px"></iframe>
+
+<div style="height:14px"></div>
+
+<strong>Grand Massif – Lift & Piste Map</strong>
+<iframe id="gmFrame"
+  src="https://www.grand-massif.com/en/trail-map/"
+  loading="lazy"
+  style="height:520px"></iframe>
+
+<div id="gmFallback" style="display:none;margin-top:10px">
+  <a class="badge" target="_blank" href="https://www.grand-massif.com/en/trail-map/">
+    Open Grand Massif official map
+  </a>
 </div>
 
-</div>
-</div>
-
-<script type="module">
+  </div>
+</div></div>
+</div><script type="module">
 import * as pdfjsLib from './pdf.mjs';
-pdfjsLib.GlobalWorkerOptions.workerSrc =
-  new URL('./pdf.worker.mjs', import.meta.url).toString();
+pdfjsLib.GlobalWorkerOptions.workerSrc = new URL('./pdf.worker.mjs', import.meta.url).toString();
 
 const $ = id => document.getElementById(id);
+$('darkBtn').onclick = () => document.body.classList.toggle('dark');
 
-// Dark mode
-$('darkBtn').onclick=()=>document.body.classList.toggle('dark');
-
-// WEATHER — Open-Meteo (no key)
+// Weather (Open-Meteo)
 const LAT=46.001, LON=6.688;
 async function loadWeather(){
   try{
@@ -179,19 +141,19 @@ loadWeather();
 
 // GM iframe fallback
 setTimeout(()=>{
-  const f=document.getElementById('gmFrame');
+  const f=$('gmFrame');
   try{
     if(!f.contentDocument || f.contentDocument.body.innerHTML.length<100){
       f.style.display='none';
-      document.getElementById('gmFallback').style.display='block';
+      $('gmFallback').style.display='block';
     }
   }catch(e){
     f.style.display='none';
-    document.getElementById('gmFallback').style.display='block';
+    $('gmFallback').style.display='block';
   }
 },3000);
 
-// OFF-PISTE LIST
+// Off-piste list
 const zones=[
   {name:'Combe de Gers',desc:'High alpine bowl. Best with a guide.'},
   {name:'Lindars / Véret Bowls',desc:'Accessible side bowls near upper lifts.'},
@@ -229,7 +191,5 @@ $('zoomIn').onclick=()=>{fit=false;scale+=0.15;render();};
 $('zoomOut').onclick=()=>{fit=false;scale=Math.max(0.6,scale-0.15);render();};
 $('fit').onclick=()=>{fit=true;render();};
 setTimeout(loadPdf,300);
-</script>
-
-</body>
+</script></body>
 </html>
