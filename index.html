@@ -60,16 +60,32 @@ canvas{width:100%;display:block;background:#fff}
     <button class="btn" id="darkBtn">🌙 Dark</button>
   </div>
 </div><div class="wrap">
-<div class="grid"><!-- WEATHER --><div class="card col-12">
+<div class="grid"><!-- WEATHER (COMBINED: FLAINE + GRAND MASSIF HIGH) --><div class="card col-12">
   <div class="card-h">
-    <strong>Live Weather (Flaine)</strong>
+    <strong>Live Weather (Flaine + Grand Massif)</strong>
     <span class="badge ok" id="wxStatus">Live</span>
   </div>
-  <div class="card-b tiles">
-    <div class="tile"><div class="k">Temperature</div><div class="v" id="wxTemp">--</div></div>
-    <div class="tile"><div class="k">Wind</div><div class="v" id="wxWind">--</div></div>
-    <div class="tile"><div class="k">Wind Gust</div><div class="v" id="wxGust">--</div></div>
-    <div class="tile"><div class="k">Snow (next hours)</div><div class="v" id="wxSnow">--</div></div>
+  <div class="card-b"><!-- Combined summary -->
+<div class="tile" style="margin-bottom:10px">
+  <div class="k">Combined summary</div>
+  <div class="v" id="wxSummary">--</div>
+  <div class="k" id="wxSummarySub" style="margin-top:4px">--</div>
+</div>
+
+<!-- Per-area tiles -->
+<div class="tiles">
+  <div class="tile">
+    <div class="k">Flaine (base / mid)</div>
+    <div class="v" id="wxFTemp">--</div>
+    <div class="k" id="wxFWind">--</div>
+  </div>
+  <div class="tile">
+    <div class="k">Grand Massif (high)</div>
+    <div class="v" id="wxGTemp">--</div>
+    <div class="k" id="wxGWind">--</div>
+  </div>
+</div>
+
   </div>
 </div><!-- PISTE MAP (PDF) --><div class="card col-12">
   <div class="card-h"><strong>Piste Map (PDF)</strong></div>
@@ -123,20 +139,53 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = new URL('./pdf.worker.mjs', import.meta
 const $ = id => document.getElementById(id);
 $('darkBtn').onclick = () => document.body.classList.toggle('dark');
 
-// Weather (Open-Meteo)
-const LAT=46.001, LON=6.688;
+// Weather (Open-Meteo) — Combined Flaine + Grand Massif
+const FLAINE = { lat:46.001, lon:6.688, name:'Flaine' };
+const GM_HIGH = { lat:46.022, lon:6.720, name:'Grand Massif (High)' };
+
+async function fetchWeather(p){
+  const url = `https://api.open-meteo.com/v1/forecast?latitude=${p.lat}&longitude=${p.lon}&current=temperature_2m,wind_speed_10m,wind_gusts_10m&hourly=snowfall,wind_gusts_10m&timezone=auto`;
+  const r = await fetch(url);
+  return await r.json();
+}
+
 async function loadWeather(){
   try{
-    const r=await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current=temperature_2m,wind_speed_10m,wind_gusts_10m&hourly=snowfall&timezone=auto`);
-    const d=await r.json();
-    $('wxTemp').textContent=Math.round(d.current.temperature_2m)+'°C';
-    $('wxWind').textContent=d.current.wind_speed_10m.toFixed(1)+' m/s';
-    $('wxGust').textContent=d.current.wind_gusts_10m.toFixed(1)+' m/s';
-    const snow=d.hourly.snowfall.slice(0,6).reduce((a,b)=>a+b,0);
-    $('wxSnow').textContent=snow>0?snow.toFixed(1)+' mm':'None';
+    const [f, g] = await Promise.all([
+      fetchWeather(FLAINE),
+      fetchWeather(GM_HIGH)
+    ]);
+
+    // Current values
+    const fTemp = Math.round(f.current.temperature_2m);
+    const gTemp = Math.round(g.current.temperature_2m);
+    const fGust = f.current.wind_gusts_10m;
+    const gGust = g.current.wind_gusts_10m;
+
+    // Snow next 24h
+    const snowF24 = f.hourly.snowfall.slice(0,24).reduce((a,b)=>a+b,0);
+    const snowG24 = g.hourly.snowfall.slice(0,24).reduce((a,b)=>a+b,0);
+
+    // Combined logic
+    const minT = Math.min(fTemp, gTemp);
+    const maxT = Math.max(fTemp, gTemp);
+    const maxGust = Math.max(fGust, gGust);
+    const snow24 = Math.max(snowF24, snowG24);
+
+    // Render combined summary
+    document.getElementById('wxSummary').textContent = `${minT}°C → ${maxT}°C · Gusts ${maxGust.toFixed(1)} m/s`;
+    document.getElementById('wxSummarySub').textContent = snow24 > 0 ? `Snow ~${snow24.toFixed(1)} mm (24h)` : 'No significant snowfall (24h)';
+
+    // Render per-area
+    document.getElementById('wxFTemp').textContent = `${fTemp}°C`;
+    document.getElementById('wxFWind').textContent = `Wind ${f.current.wind_speed_10m.toFixed(1)} m/s · Gust ${fGust.toFixed(1)}`;
+
+    document.getElementById('wxGTemp').textContent = `${gTemp}°C`;
+    document.getElementById('wxGWind').textContent = `Wind ${g.current.wind_speed_10m.toFixed(1)} m/s · Gust ${gGust.toFixed(1)}`;
+
   }catch(e){
-    $('wxStatus').textContent='Unavailable';
-    $('wxStatus').className='badge warn';
+    document.getElementById('wxStatus').textContent = 'Unavailable';
+    document.getElementById('wxStatus').className = 'badge warn';
   }
 }
 loadWeather();
