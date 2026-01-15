@@ -1,8 +1,11 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Flaine & Grand Massif Snowboard Dashboard</title><style>
+<title>Flaine & Grand Massif Snowboard Dashboard</title>
+
+<style>
 :root{
   --bg:#eef2f7; --card:#ffffff; --text:#0b1220; --muted:#5b6575;
   --brand:#0c3b66; --brand2:#0a2f52;
@@ -51,7 +54,12 @@ canvas{width:100%;display:block;background:#fff}
 
 .col-12{grid-column:span 12}
 @media(max-width:860px){.tiles{grid-template-columns:1fr}}
-</style></head><body><div class="topbar">
+</style>
+</head>
+
+<body>
+
+<div class="topbar">
   <div class="topbar-row">
     <div>
       <strong>Flaine & Grand Massif</strong><br>
@@ -59,35 +67,52 @@ canvas{width:100%;display:block;background:#fff}
     </div>
     <button class="btn" id="darkBtn">🌙 Dark</button>
   </div>
-</div><div class="wrap">
-<div class="grid"><!-- WEATHER (COMBINED: FLAINE + GRAND MASSIF HIGH) --><div class="card col-12">
+</div>
+
+<div class="wrap">
+<div class="grid">
+
+<!-- WEATHER HUD (SNOWBOARD DECISION VIEW: FLAINE + GM HIGH) -->
+<div class="card col-12">
   <div class="card-h">
-    <strong>Live Weather (Flaine + Grand Massif)</strong>
+    <strong>Weather HUD (Flaine + Grand Massif)</strong>
     <span class="badge ok" id="wxStatus">Live</span>
   </div>
-  <div class="card-b"><!-- Combined summary -->
-<div class="tile" style="margin-bottom:10px">
-  <div class="k">Combined summary</div>
-  <div class="v" id="wxSummary">--</div>
-  <div class="k" id="wxSummarySub" style="margin-top:4px">--</div>
+  <div class="card-b">
+
+    <!-- Decision Bar -->
+    <div class="tile" id="wxDecision" style="margin-bottom:10px">
+      <div class="k" id="wxDecisionTitle">--</div>
+      <div class="v" id="wxDecisionMain">--</div>
+      <div class="k" id="wxDecisionSub" style="margin-top:6px">--</div>
+    </div>
+
+    <!-- Base vs High chips -->
+    <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:10px">
+      <div class="tile" style="padding:10px">
+        <div class="k">Flaine (Base/Mid)</div>
+        <div class="v" id="wxChipF">--</div>
+        <div class="k" id="wxChipFSub" style="margin-top:4px">--</div>
+      </div>
+      <div class="tile" style="padding:10px">
+        <div class="k">Grand Massif (High)</div>
+        <div class="v" id="wxChipG">--</div>
+        <div class="k" id="wxChipGSub" style="margin-top:4px">--</div>
+      </div>
+    </div>
+
+    <!-- Next 6 hours micro-timeline -->
+    <div class="tile" style="padding:10px">
+      <div class="k">Next 6 hours (snow + gusts)</div>
+      <div id="wxTimeline" style="display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px;margin-top:8px"></div>
+      <div class="k" id="wxRideCall" style="margin-top:10px;font-weight:900">--</div>
+    </div>
+
+  </div>
 </div>
 
-<!-- Per-area tiles -->
-<div class="tiles">
-  <div class="tile">
-    <div class="k">Flaine (base / mid)</div>
-    <div class="v" id="wxFTemp">--</div>
-    <div class="k" id="wxFWind">--</div>
-  </div>
-  <div class="tile">
-    <div class="k">Grand Massif (high)</div>
-    <div class="v" id="wxGTemp">--</div>
-    <div class="k" id="wxGWind">--</div>
-  </div>
-</div>
-
-  </div>
-</div><!-- PISTE MAP (PDF) --><div class="card col-12">
+<!-- PISTE MAP (PDF) -->
+<div class="card col-12">
   <div class="card-h"><strong>Piste Map (PDF)</strong></div>
   <div class="card-b">
     <div class="pdfwrap">
@@ -105,34 +130,46 @@ canvas{width:100%;display:block;background:#fff}
       <canvas id="pdfCanvas"></canvas>
     </div>
   </div>
-</div><!-- OFF-PISTE --><div class="card col-12">
+</div>
+
+<!-- OFF-PISTE -->
+<div class="card col-12">
   <div class="card-h"><strong>Off-piste (community-known zones)</strong></div>
   <div class="card-b" id="offpisteList"></div>
-</div><!-- OFFICIAL LIFT STATUS (LAST) --><div class="card col-12">
+</div>
+
+<!-- OFFICIAL LIFT STATUS (LAST) -->
+<div class="card col-12">
   <div class="card-h">
     <strong>Official Lift & Piste Status</strong>
     <span class="badge ok">Live</span>
   </div>
-  <div class="card-b"><strong>Flaine – Opening Status</strong>
-<iframe src="https://www.flaine.com/en/weather-opening/" loading="lazy" style="height:520px"></iframe>
+  <div class="card-b">
 
-<div style="height:14px"></div>
+    <strong>Flaine – Opening Status</strong>
+    <iframe src="https://www.flaine.com/en/weather-opening/" loading="lazy" style="height:520px"></iframe>
 
-<strong>Grand Massif – Lift & Piste Openings</strong>
-<iframe id="gmFrame"
-  src="https://www.grand-massif.com/en/information-on-trail-openings/"
-  loading="lazy"
-  style="height:520px"></iframe>
+    <div style="height:14px"></div>
 
-<div id="gmFallback" style="display:none;margin-top:10px">
-  <a class="badge" target="_blank" href="https://www.grand-massif.com/en/information-on-trail-openings/">
-    Open Grand Massif official lift & piste openings
-  </a>
-</div>
+    <strong>Grand Massif – Lift & Piste Openings</strong>
+    <iframe id="gmFrame"
+      src="https://www.grand-massif.com/en/information-on-trail-openings/"
+      loading="lazy"
+      style="height:520px"></iframe>
+
+    <div id="gmFallback" style="display:none;margin-top:10px">
+      <a class="badge" target="_blank" href="https://www.grand-massif.com/en/information-on-trail-openings/">
+        Open Grand Massif official lift & piste openings
+      </a>
+    </div>
 
   </div>
-</div></div>
-</div><script type="module">
+</div>
+
+</div>
+</div>
+
+<script type="module">
 import * as pdfjsLib from './pdf.mjs';
 pdfjsLib.GlobalWorkerOptions.workerSrc = new URL('./pdf.worker.mjs', import.meta.url).toString();
 
@@ -156,36 +193,89 @@ async function loadWeather(){
       fetchWeather(GM_HIGH)
     ]);
 
-    // Current values
+    const sum = (arr)=>arr.reduce((a,b)=>a+b,0);
+    const max = (arr)=>arr.reduce((a,b)=>Math.max(a,b), -Infinity);
+
+    // Current
     const fTemp = Math.round(f.current.temperature_2m);
     const gTemp = Math.round(g.current.temperature_2m);
+    const fWind = f.current.wind_speed_10m;
+    const gWind = g.current.wind_speed_10m;
     const fGust = f.current.wind_gusts_10m;
     const gGust = g.current.wind_gusts_10m;
 
-    // Snow next 24h
-    const snowF24 = f.hourly.snowfall.slice(0,24).reduce((a,b)=>a+b,0);
-    const snowG24 = g.hourly.snowfall.slice(0,24).reduce((a,b)=>a+b,0);
+    // Forecast (next 6h + 12h/24h)
+    const snowF12 = sum(f.hourly.snowfall.slice(0,12));
+    const snowG12 = sum(g.hourly.snowfall.slice(0,12));
+    const snowF24 = sum(f.hourly.snowfall.slice(0,24));
+    const snowG24 = sum(g.hourly.snowfall.slice(0,24));
 
-    // Combined logic
+    const gustF6 = f.hourly.wind_gusts_10m.slice(0,6);
+    const gustG6 = g.hourly.wind_gusts_10m.slice(0,6);
+
+    // Combined view
     const minT = Math.min(fTemp, gTemp);
     const maxT = Math.max(fTemp, gTemp);
-    const maxGust = Math.max(fGust, gGust);
+    const snow12 = Math.max(snowF12, snowG12);
     const snow24 = Math.max(snowF24, snowG24);
 
-    // Render combined summary
-    document.getElementById('wxSummary').textContent = `${minT}°C → ${maxT}°C · Gusts ${maxGust.toFixed(1)} m/s`;
-    document.getElementById('wxSummarySub').textContent = snow24 > 0 ? `Snow ~${snow24.toFixed(1)} mm (24h)` : 'No significant snowfall (24h)';
+    // Wind risk (use GM High gust more heavily)
+    const riskG = gGust;
+    let riskLabel='Stable', riskEmoji='🟢', riskCls='badge ok';
+    if(riskG >= 12){ riskLabel='High (closures likely)'; riskEmoji='🔴'; riskCls='badge warn'; }
+    else if(riskG >= 8){ riskLabel='Moderate (upper lifts at risk)'; riskEmoji='🟠'; riskCls='badge warn'; }
 
-    // Render per-area
-    document.getElementById('wxFTemp').textContent = `${fTemp}°C`;
-    document.getElementById('wxFWind').textContent = `Wind ${f.current.wind_speed_10m.toFixed(1)} m/s · Gust ${fGust.toFixed(1)}`;
+    // Update status badge
+    const st = document.getElementById('wxStatus');
+    st.textContent = 'Live';
+    st.className = riskCls;
 
-    document.getElementById('wxGTemp').textContent = `${gTemp}°C`;
-    document.getElementById('wxGWind').textContent = `Wind ${g.current.wind_speed_10m.toFixed(1)} m/s · Gust ${gGust.toFixed(1)}`;
+    // Decision bar
+    document.getElementById('wxDecisionTitle').textContent = `${riskEmoji} WIND RISK: ${riskLabel}`;
+    document.getElementById('wxDecisionMain').textContent = `${minT}°C → ${maxT}°C · Gust ${riskG.toFixed(1)} m/s`;
+    document.getElementById('wxDecisionSub').textContent =
+      snow24 > 0 ? `Snow: ${snow12.toFixed(1)} mm (12h) · ${snow24.toFixed(1)} mm (24h)` : `Snow: none expected (24h)`;
+
+    // Chips
+    document.getElementById('wxChipF').textContent = `${fTemp}°C`;
+    document.getElementById('wxChipFSub').textContent =
+      `Wind ${fWind.toFixed(1)} · Gust ${fGust.toFixed(1)} · Snow ${snowF12.toFixed(1)}mm/12h`;
+
+    document.getElementById('wxChipG').textContent = `${gTemp}°C`;
+    document.getElementById('wxChipGSub').textContent =
+      `Wind ${gWind.toFixed(1)} · Gust ${gGust.toFixed(1)} · Snow ${snowG12.toFixed(1)}mm/12h`;
+
+    // Timeline blocks (use the WORSE-case between the two for each hour)
+    const tl = document.getElementById('wxTimeline');
+    tl.innerHTML='';
+    for(let i=0;i<6;i++){
+      const snowH = Math.max(f.hourly.snowfall[i]||0, g.hourly.snowfall[i]||0);
+      const gustH = Math.max(gustF6[i]||0, gustG6[i]||0);
+      const b = document.createElement('div');
+      b.style.border = '1px solid var(--ring)';
+      b.style.borderRadius = '12px';
+      b.style.padding = '8px';
+      b.style.background = 'rgba(12,59,102,.06)';
+      b.innerHTML = `<div style="font-weight:900">+${i+1}h</div>
+        <div style="font-size:.9rem;color:var(--muted);margin-top:4px">🌨️ ${snowH.toFixed(1)} mm</div>
+        <div style="font-size:.9rem;color:var(--muted)">💨 ${gustH.toFixed(1)} m/s</div>`;
+      tl.appendChild(b);
+    }
+
+    // Ride call (simple rules)
+    let call = 'Ride call: ';
+    const snowGood = snow12 >= 5;
+    const windy = riskG >= 8;
+    if(snowGood && !windy) call += 'Alpine bowls window — go high early.';
+    else if(snowGood && windy) call += 'Fresh snow but windy — trees recommended, watch upper closures.';
+    else if(!snowGood && windy) call += 'Windy & no fresh — stay lower, cruise pistes, plan early return.';
+    else call += 'Stable day — explore pistes; off-piste only if you know entries.';
+    document.getElementById('wxRideCall').textContent = call;
 
   }catch(e){
-    document.getElementById('wxStatus').textContent = 'Unavailable';
-    document.getElementById('wxStatus').className = 'badge warn';
+    const st = document.getElementById('wxStatus');
+    st.textContent='Unavailable';
+    st.className='badge warn';
   }
 }
 loadWeather();
@@ -243,7 +333,7 @@ $('zoomOut').onclick=()=>{fit=false;scale=Math.max(0.6,scale-0.15);render();};
 $('fit').onclick=()=>{fit=true;render();};
 setTimeout(loadPdf,300);
 
-// ===== PDF PAN + DOUBLE-TAP ZOOM (STEP 1) =====
+// ===== PDF PAN + DOUBLE-TAP ZOOM =====
 let isDragging=false,startX=0,startY=0,offsetX=0,offsetY=0,lastTap=0;
 const pdfEl=document.getElementById('pdfCanvas');
 
@@ -269,7 +359,6 @@ pdfEl.addEventListener('pointerup',e=>{
   isDragging=false;
   const now=Date.now();
   if(now-lastTap<300){
-    // double tap → toggle zoom
     fit=false;
     scale = scale < 1.6 ? scale + 0.6 : 0.9;
     offsetX=0; offsetY=0;
@@ -278,6 +367,8 @@ pdfEl.addEventListener('pointerup',e=>{
   }
   lastTap=now;
 });
+</script>
 
-</script></body>
+</body>
 </html>
+```0
